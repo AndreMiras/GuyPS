@@ -22,8 +22,29 @@
             pos: self.pos
             size: self.size
 
-RelativeLayout:
+<MenuScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            text: 'Back to map'
+            on_press: root.manager.current = 'map'
+        Button:
+            text: 'Goto settings'
+            on_press: root.manager.current = 'settings'
 
+<SettingsScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            text: 'My settings button'
+        Button:
+            text: 'Back to map'
+            on_press: root.manager.current = 'map'
+        Button:
+            text: 'Back to menu'
+            on_press: root.manager.current = 'menu'
+
+<MapViewScreen@Screen>:
     CustomMapView:
         id: mapview
         lat: 50.6394
@@ -45,10 +66,13 @@ RelativeLayout:
 
     Toolbar:
         top: root.top
-        Spinner:
-            text: "mapnik"
-            values: MapSource.providers.keys()
-            on_text: mapview.map_source = self.text
+        # Spinner:
+        #     text: "mapnik"
+        #     values: MapSource.providers.keys()
+        #     on_text: mapview.map_source = self.text
+        Button:
+            text: 'Menu'
+            on_press: root.manager.current = 'menu'
         TextInput:
             multiline: False
             on_text_validate: mapview.search(self.text)
@@ -58,3 +82,19 @@ RelativeLayout:
             text: "Longitude: {}".format(mapview.lon)
         Label:
             text: "Latitude: {}".format(mapview.lat)
+
+
+
+
+RelativeLayout:
+
+    ScreenManager:
+
+        MapViewScreen:
+            name: 'map'
+
+        MenuScreen:
+            name: 'menu'
+
+        SettingsScreen:
+            name: 'settings'
