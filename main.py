@@ -1,3 +1,4 @@
+__version__ = '0.1'
 from kivy.garden.mapview import MapView, MapMarker, Coordinate
 from kivy.app import App
 from geopy.geocoders import Nominatim
