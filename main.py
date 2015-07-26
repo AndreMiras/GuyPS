@@ -10,9 +10,10 @@ class CustomMapView(MapView):
 
     def on_touch_down(self, touch):
         if touch.is_double_tap:
-            latlon = self.get_latlon_at(touch.pos[0], touch.pos[1])
-            m1 = MapMarker(lat=latlon.lat, lon=latlon.lon)
-            self.add_marker(m1)
+            # latlon = self.get_latlon_at(touch.pos[0], touch.pos[1])
+            # m1 = MapMarker(lat=latlon.lat, lon=latlon.lon)
+            # self.add_marker(m1)
+            self.animated_diff_scale_at(1, *touch.pos)
         return super(CustomMapView, self).on_touch_down(touch)
 
     def search(self, text):
