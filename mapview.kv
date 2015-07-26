@@ -1,3 +1,4 @@
+#:import find kivy.resources
 #:import MapSource mapview.MapSource
 
 <Toolbar@BoxLayout>:
@@ -27,7 +28,9 @@
         orientation: 'vertical'
         Button:
             text: 'Back to map'
-            on_press: root.manager.current = 'map'
+            on_press:
+                root.manager.current = 'map'
+                root.manager.transition.direction = 'left'
         Button:
             text: 'Goto settings'
             on_press: root.manager.current = 'settings'
@@ -39,10 +42,14 @@
             text: 'My settings button'
         Button:
             text: 'Back to map'
-            on_press: root.manager.current = 'map'
+            on_press:
+                root.manager.current = 'map'
+                root.manager.transition.direction = 'left'
         Button:
             text: 'Back to menu'
-            on_press: root.manager.current = 'menu'
+            on_press:
+                root.manager.current = 'menu'
+                root.manager.transition.direction = 'left'
 
 <MapViewScreen@Screen>:
     CustomMapView:
@@ -71,8 +78,14 @@
         #     values: MapSource.providers.keys()
         #     on_text: mapview.map_source = self.text
         Button:
-            text: 'Menu'
-            on_press: root.manager.current = 'menu'
+            size_hint_x: None
+            width: '48dp'
+            font_name: find.resource_find('static/fonts/fontawesome-4.3.0-webfont.ttf')
+            # text: 'Menu'
+            text: unichr(0xf0c9)
+            on_press:
+                root.manager.current = 'menu'
+                root.manager.transition.direction = 'right'
         TextInput:
             multiline: False
             on_text_validate: mapview.search(self.text)
