@@ -1,10 +1,16 @@
 __version__ = '0.1'
 from kivy.garden.mapview import MapView, MapMarker, Coordinate
 from kivy.app import App
+from kivy.uix.popup import Popup
+from kivy.properties import StringProperty
 from geopy.geocoders import Nominatim
 
 
 app = None
+
+class PopupMessage(Popup):
+    title = StringProperty()
+    body = StringProperty()
 
 class CustomMapView(MapView):
 
@@ -19,6 +25,12 @@ class CustomMapView(MapView):
     def search(self, text):
         geolocator = Nominatim()
         location = geolocator.geocode(text)
+        if location is None:
+            popup = PopupMessage(
+                        title="Error",
+                        body="Can't find location.")
+            popup.open()
+            return
         # location.raw['boundingbox']
         latitude = location.latitude
         longitude = location.longitude

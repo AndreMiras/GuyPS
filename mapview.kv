@@ -96,8 +96,12 @@
         Label:
             text: "Latitude: {}".format(mapview.lat)
 
-
-
+<PopupMessage>:
+    size_hint: .5, .5
+    auto_dismiss: True
+    title: root.title
+    Label:
+        text: root.body
 
 RelativeLayout:
 
