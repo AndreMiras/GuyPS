@@ -33,7 +33,7 @@ version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma seperated e.g. requirements = sqlite3,kivy
-requirements = kivy,openssl,sqlite3,pil,futures,requests,geopy
+requirements = kivy,openssl,sqlite3,pil,futures,requests,geopy,plyer
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -60,7 +60,7 @@ fullscreen = 1
 #
 
 # (list) Permissions
-android.permissions = INTERNET
+android.permissions = INTERNET,ACCESS_FINE_LOCATION
 
 # (int) Android API to use
 #android.api = 14

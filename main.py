@@ -2,7 +2,10 @@ __version__ = '0.1'
 from kivy.garden.mapview import MapView, MapMarker, Coordinate
 from kivy.app import App
 from kivy.uix.popup import Popup
-from kivy.properties import StringProperty
+from kivy.uix.relativelayout import RelativeLayout
+from kivy.uix.screenmanager import Screen
+from kivy.properties import StringProperty, ObjectProperty
+from plyer import gps
 from geopy.geocoders import Nominatim
 
 
@@ -36,13 +39,41 @@ class CustomMapView(MapView):
         longitude = location.longitude
         self.center_on(latitude, longitude)
 
+class Controller(RelativeLayout):
+    mapview_screen_property = ObjectProperty()
+
+    def gps_localize(self):
+        print "gps_localize"
+        # TODO: loading status
+        self.gps = gps
+        try:
+            self.gps.configure(on_location=self.on_location, on_status=self.on_status)
+            self.gps.start()
+        except NotImplementedError:
+            popup = PopupMessage(
+                        title="Error",
+                        body="GPS not found.")
+            popup.open()
+
+    def on_location(self, **kwargs):
+        # TODO: close loading status
+        self.gps_location = '\n'.join(['{}={}'.format(k, v) for k, v in kwargs.items()])
+        # map_screen = self.manager.get_screen('map')
+        mapview = self.mapview_screen_property.ids['mapview']
+        latitude = kwargs['lat']
+        longitude = kwargs['lon']
+        mapview.center_on(latitude, longitude)
+
+    def on_status(self, stype, status):
+        # TODO: use the status bar
+        self.gps_status = 'type={}\n{}'.format(stype, status)
 
 
 class MapViewApp(App):
     def build(self):
-        # mapview = CustomMapView(zoom=11, lat=50.6394, lon=3.057)
-        # return mapview
         global app
         app = self
+        self.controller = Controller()
+        return self.controller
 
 MapViewApp().run()

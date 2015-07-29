@@ -32,6 +32,12 @@
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         Button:
+            text: 'GPS location'
+            on_press:
+                root.manager.current = 'map'
+                root.manager.transition.direction = 'left'
+                app.controller.gps_localize()
+        Button:
             text: 'Goto settings'
             on_press: root.manager.current = 'settings'
 
@@ -100,18 +106,25 @@
     size_hint: .5, .5
     auto_dismiss: True
     title: root.title
+    on_touch_down:
+        self.dismiss()
     Label:
         text: root.body
 
-RelativeLayout:
+# RelativeLayout:
+<Controller>:
+    mapview_screen_property: mapview_screen
 
     ScreenManager:
 
         MapViewScreen:
+            id: mapview_screen
             name: 'map'
 
         MenuScreen:
+            id: menu_screen
             name: 'menu'
 
         SettingsScreen:
+            id: settings_screen
             name: 'settings'
