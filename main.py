@@ -22,9 +22,7 @@ class CustomMapView(MapView):
 
     def on_touch_down(self, touch):
         if touch.is_double_tap:
-            # latlon = self.get_latlon_at(touch.pos[0], touch.pos[1])
-            # m1 = MapMarker(lat=latlon.lat, lon=latlon.lon)
-            # self.add_marker(m1)
+            latlon = self.get_latlon_at(touch.pos[0], touch.pos[1])
             self.animated_diff_scale_at(1, *touch.pos)
         return super(CustomMapView, self).on_touch_down(touch)
 
@@ -81,8 +79,14 @@ class Controller(RelativeLayout):
                         body=message)
             popup.open()
 
+    def toggle_gps_localize(self, start):
+        if start:
+            self.gps_localize()
+        else:
+            gps.stop()
+
     def on_location(self, **kwargs):
-        gps.stop()
+        # gps.stop()
         mapview = self.mapview_property
         mapview_screen = self.mapview_screen_property
         latitude = kwargs['lat']

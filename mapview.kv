@@ -31,13 +31,14 @@
             on_press:
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
-        Button:
+        ToggleButton:
             font_name: find.resource_find('static/fonts/fontawesome-4.3.0-webfont.ttf')
             text: unichr(0xf041)
-            on_press:
+            on_state:
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
-                app.controller.gps_localize()
+                start = self.state == 'down'
+                app.controller.toggle_gps_localize(start)
         Button:
             text: 'Goto settings'
             on_press: root.manager.current = 'settings'
