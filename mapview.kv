@@ -32,7 +32,8 @@
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         Button:
-            text: 'GPS location'
+            font_name: find.resource_find('static/fonts/fontawesome-4.3.0-webfont.ttf')
+            text: unichr(0xf041)
             on_press:
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
@@ -57,7 +58,9 @@
                 root.manager.current = 'menu'
                 root.manager.transition.direction = 'left'
 
-<MapViewScreen@Screen>:
+<MapViewScreen>:
+    search_input_property: search_input
+
     CustomMapView:
         id: mapview
         lat: 50.6394
@@ -87,20 +90,19 @@
             size_hint_x: None
             width: '48dp'
             font_name: find.resource_find('static/fonts/fontawesome-4.3.0-webfont.ttf')
-            # text: 'Menu'
             text: unichr(0xf0c9)
             on_press:
                 root.manager.current = 'menu'
                 root.manager.transition.direction = 'right'
         TextInput:
+            id: search_input
             multiline: False
             on_text_validate: mapview.search(self.text)
 
     Toolbar:
+        id: status_bar
         Label:
-            text: "Longitude: {}".format(mapview.lon)
-        Label:
-            text: "Latitude: {}".format(mapview.lat)
+            text: root.status_message
 
 <PopupMessage>:
     size_hint: .5, .5
