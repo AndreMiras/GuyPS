@@ -18,6 +18,25 @@ class PopupMessage(Popup):
     title = StringProperty()
     body = StringProperty()
 
+class GpsMarker(MapMarker):
+
+    def update_position(self):
+        """
+        Updates marker position on map layer.
+        """
+        layer = self._layer
+        if layer is None:
+            return
+        mapview = layer.parent
+        marker = self
+        layer.set_marker_position(mapview, marker)
+
+    def on_lat(self, instance, value):
+        self.update_position()
+
+    def on_lon(self, instance, value):
+        self.update_position()
+
 class CustomMapView(MapView):
 
     def on_touch_down(self, touch):
@@ -58,6 +77,7 @@ class Controller(RelativeLayout):
 
     def __init__(self, **kwargs):
         super(Controller, self).__init__(**kwargs)
+        self.gps_marker = None
         self.mapview_property = self.mapview_screen_property.ids['mapview']
         self.bind_events()
 
@@ -65,7 +85,7 @@ class Controller(RelativeLayout):
         search_input = self.mapview_screen_property.search_input_property
         search_input.bind(on_text_validate=lambda instance: self.on_search(search_input.text))
 
-    def gps_localize(self):
+    def start_gps_localize(self):
         mapview_screen = self.mapview_screen_property
         mapview_screen.update_status_message("Waiting for GPS location...", 10)
         try:
@@ -79,11 +99,18 @@ class Controller(RelativeLayout):
                         body=message)
             popup.open()
 
+    def stop_gps_localize(self):
+        mapview = self.mapview_property
+        gps.stop()
+        # if self.gps_marker is None:
+        mapview.remove_marker(self.gps_marker)
+        self.gps_marker = None
+
     def toggle_gps_localize(self, start):
         if start:
-            self.gps_localize()
+            self.start_gps_localize()
         else:
-            gps.stop()
+            self.stop_gps_localize()
 
     def on_location(self, **kwargs):
         # gps.stop()
@@ -91,6 +118,12 @@ class Controller(RelativeLayout):
         mapview_screen = self.mapview_screen_property
         latitude = kwargs['lat']
         longitude = kwargs['lon']
+        if self.gps_marker is None:
+            self.gps_marker = GpsMarker(lat=latitude, lon=longitude)
+            mapview.add_marker(self.gps_marker)
+        else:
+            self.gps_marker.lat = latitude
+            self.gps_marker.lon = longitude
         mapview.center_on(latitude, longitude)
         mapview_screen.update_status_message(
             "Latitude: %s / Longitude: %s" % (round(latitude, 2), round(longitude, 2)), 10)
