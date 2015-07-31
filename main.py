@@ -8,6 +8,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty, ObjectProperty
+from kivy.animation import Animation
 from plyer import gps
 from geopy.geocoders import Nominatim
 
@@ -39,6 +40,25 @@ class GpsMarker(MapMarker):
 
 class CustomMapView(MapView):
 
+    animated_latlon_property = ObjectProperty()
+
+    def __init__(self, **kwargs):
+        super(CustomMapView, self).__init__(**kwargs)
+        self.animated_latlon_property = Coordinate(self.lat, self.lon)
+
+    def animated_center_on(self, latitude, longitude):
+        widget = self
+        anim = Animation(
+            animated_latlon_property = Coordinate(latitude, longitude))
+        anim.start(widget)
+
+    def on_animated_latlon_property(self, instance, coordinate):
+        # coordinate somehow lost its type
+        coordinate = Coordinate(coordinate[0], coordinate[1])
+        latitude = coordinate.lat
+        longitude = coordinate.lon
+        self.center_on(latitude, longitude)
+
     def on_touch_down(self, touch):
         if touch.is_double_tap:
             latlon = self.get_latlon_at(touch.pos[0], touch.pos[1])
@@ -57,7 +77,8 @@ class CustomMapView(MapView):
         # location.raw['boundingbox']
         latitude = location.latitude
         longitude = location.longitude
-        self.center_on(latitude, longitude)
+        # self.center_on(latitude, longitude)
+        self.animated_center_on(latitude, longitude)
 
 class MapViewScreen(Screen):
 
@@ -124,7 +145,7 @@ class Controller(RelativeLayout):
         else:
             self.gps_marker.lat = latitude
             self.gps_marker.lon = longitude
-        mapview.center_on(latitude, longitude)
+        mapview.animated_center_on(latitude, longitude)
         mapview_screen.update_status_message(
             "Latitude: %s / Longitude: %s" % (round(latitude, 2), round(longitude, 2)), 10)
 
