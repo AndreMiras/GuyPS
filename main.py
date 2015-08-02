@@ -2,6 +2,7 @@ __version__ = '0.1'
 import os
 import glob
 import logging
+from threading import Thread
 from kivy.garden.mapview import MapView, MapMarker, Coordinate
 from kivy.app import App
 from kivy.clock import Clock
@@ -201,7 +202,8 @@ class Controller(RelativeLayout):
         bbox = (min_lon, min_lat, max_lon, max_lat)
         mb.add_coverage(bbox=bbox,
             zoomlevels=[12, 13, 14, 15])
-        mb.run()
+        # mb.run()
+        Thread(target=mb.run).start()
 
 
 class MapViewApp(App):
