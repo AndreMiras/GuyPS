@@ -24,7 +24,6 @@
             size: self.size
 
 <OfflineMapsScreen>:
-
     BoxLayout:
         id: layout_boxlayout
         orientation: 'vertical'
@@ -34,6 +33,10 @@
         Spinner:
             text: "Choose a offline map"
             values: root.available_offline_maps()
+            on_text:
+                app.controller.load_mbtiles(self.text)
+                root.manager.current = 'map'
+                root.manager.transition.direction = 'left'
         Button:
             text: 'Back to map'
             on_press:

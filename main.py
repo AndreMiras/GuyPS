@@ -3,6 +3,7 @@ import glob
 import logging
 from threading import Thread
 from kivy.garden.mapview import MapView, MapMarker, Coordinate
+from kivy.garden.mapview.mapview.mbtsource import MBTilesMapSource
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.popup import Popup
@@ -47,7 +48,6 @@ class GpsMarker(MapMarker):
 
 
 class OfflineMapsScreen(Screen):
-    offline_maps_dropdown_property = ObjectProperty()
 
     def available_offline_maps(self):
         """
@@ -57,6 +57,8 @@ class OfflineMapsScreen(Screen):
         filepaths = glob.glob(filepath)
         filenames = [os.path.basename(x) for x in filepaths]
         return filenames
+
+    # on_text: load_mbtiles(self, mbtiles_path):
 
 
 class CustomMapView(MapView):
@@ -98,6 +100,11 @@ class CustomMapView(MapView):
         longitude = location.longitude
         # self.center_on(latitude, longitude)
         self.animated_center_on(latitude, longitude)
+
+    def load_mbtiles(self, mbtiles):
+        mbtiles_path = os.path.join(MBTILES_DIRECTORY, mbtiles)
+        map_source = MBTilesMapSource(mbtiles_path)
+        self.map_source = map_source
 
 
 class MapViewScreen(Screen):
@@ -212,6 +219,10 @@ class Controller(RelativeLayout):
                         zoomlevels=[12, 13, 14, 15])
         # mb.run()
         Thread(target=mb.run).start()
+
+    def load_mbtiles(self, mbtiles):
+        mapview = self.mapview_property
+        mapview.load_mbtiles(mbtiles)
 
 
 class MapViewApp(App):
