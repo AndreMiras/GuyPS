@@ -6,16 +6,14 @@ from threading import Thread
 from kivy.garden.mapview import MapView, MapMarker, Coordinate
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.uix.label import Label
 from kivy.uix.popup import Popup
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty, ObjectProperty
 from kivy.animation import Animation
 from plyer import gps
 from geopy.geocoders import Nominatim
-from landez import MBTilesBuilder, TilesManager
+from landez import MBTilesBuilder
 
 
 MBTILES_DIRECTORY = 'mbtiles'
