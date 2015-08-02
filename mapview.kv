@@ -23,6 +23,26 @@
             pos: self.pos
             size: self.size
 
+<OfflineMapsScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        TextInput:
+            id: search_input
+            multiline: False
+            on_text_validate: app.controller.download_for_offline(self.text)
+        Button:
+            text: 'My settings button'
+        Button:
+            text: 'Back to map'
+            on_press:
+                root.manager.current = 'map'
+                root.manager.transition.direction = 'left'
+        Button:
+            text: 'Back to menu'
+            on_press:
+                root.manager.current = 'menu'
+                root.manager.transition.direction = 'left'
+
 <MenuScreen@Screen>:
     BoxLayout:
         orientation: 'vertical'
@@ -39,6 +59,11 @@
                 root.manager.transition.direction = 'left'
                 start = self.state == 'down'
                 app.controller.toggle_gps_localize(start)
+        Button:
+            text: 'Offline maps'
+            on_press:
+                root.manager.current = 'offline_maps'
+                root.manager.transition.direction = 'right'
         Button:
             text: 'Goto settings'
             on_press: root.manager.current = 'settings'
@@ -64,8 +89,10 @@
 
     CustomMapView:
         id: mapview
-        lat: 50.6394
-        lon: 3.057
+        # lat: 50.6394
+        # lon: 3.057
+        lat: 43.61
+        lon: 3.88
         zoom: 8
         #size_hint: .5, .5
         #pos_hint: {"x": .25, "y": .25}
@@ -118,6 +145,10 @@
         MenuScreen:
             id: menu_screen
             name: 'menu'
+
+        OfflineMapsScreen:
+            id: offline_maps_screen
+            name: 'offline_maps'
 
         SettingsScreen:
             id: settings_screen

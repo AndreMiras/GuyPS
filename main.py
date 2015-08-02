@@ -1,4 +1,6 @@
 __version__ = '0.1'
+import os
+import logging
 from kivy.garden.mapview import MapView, MapMarker, Coordinate
 from kivy.app import App
 from kivy.clock import Clock
@@ -11,8 +13,11 @@ from kivy.properties import StringProperty, ObjectProperty
 from kivy.animation import Animation
 from plyer import gps
 from geopy.geocoders import Nominatim
+from landez import MBTilesBuilder, TilesManager
 
 
+MBTILES_DIRECTORY = 'mbtiles'
+logging.basicConfig(level=logging.DEBUG)
 app = None
 
 class PopupMessage(Popup):
@@ -74,7 +79,6 @@ class CustomMapView(MapView):
                         body="Can't find location.")
             popup.open()
             return
-        # location.raw['boundingbox']
         latitude = location.latitude
         longitude = location.longitude
         # self.center_on(latitude, longitude)
@@ -157,6 +161,35 @@ class Controller(RelativeLayout):
     def on_search(self, text):
         mapview_screen= self.mapview_screen_property
         mapview_screen.update_status_message("Looking for \"%s\"" % (text))
+
+    def download_for_offline(self, text):
+        geolocator = Nominatim()
+        location = geolocator.geocode(text)
+        if location is None:
+            popup = PopupMessage(
+                        title="Error",
+                        body="Can't find location.")
+            popup.open()
+            return
+        if location.raw['type'] != 'city':
+            popup = PopupMessage(
+                        title="Error",
+                        body="Only cities are allowed.")
+            popup.open()
+            return
+        # exctracts the city from the address string
+        city = location.address.split(',')[0]
+        if not os.path.exists(MBTILES_DIRECTORY):
+            os.makedirs(MBTILES_DIRECTORY)
+        filename = city + '.mbtiles'
+        filepath = os.path.join(MBTILES_DIRECTORY, filename)
+        mb = MBTilesBuilder(filepath=filepath, cache=True)
+        # changes geopy bounding box format to landez one
+        (min_lat, max_lat, min_lon, max_lon) = [float(x) for x in location.raw['boundingbox']]
+        bbox = (min_lon, min_lat, max_lon, max_lat)
+        mb.add_coverage(bbox=bbox,
+            zoomlevels=[12, 13, 14, 15])
+        mb.run()
 
 
 class MapViewApp(App):
