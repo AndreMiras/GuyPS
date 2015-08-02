@@ -1,4 +1,3 @@
-__version__ = '0.1'
 import os
 import glob
 import logging
@@ -16,13 +15,16 @@ from geopy.geocoders import Nominatim
 from landez import MBTilesBuilder
 
 
+__version__ = '0.1'
 MBTILES_DIRECTORY = 'mbtiles'
 logging.basicConfig(level=logging.DEBUG)
 app = None
 
+
 class PopupMessage(Popup):
     title = StringProperty()
     body = StringProperty()
+
 
 class GpsMarker(MapMarker):
 
@@ -43,6 +45,7 @@ class GpsMarker(MapMarker):
     def on_lon(self, instance, value):
         self.update_position()
 
+
 class OfflineMapsScreen(Screen):
     offline_maps_dropdown_property = ObjectProperty()
 
@@ -55,6 +58,7 @@ class OfflineMapsScreen(Screen):
         filenames = [os.path.basename(x) for x in filepaths]
         return filenames
 
+
 class CustomMapView(MapView):
 
     animated_latlon_property = ObjectProperty()
@@ -66,7 +70,7 @@ class CustomMapView(MapView):
     def animated_center_on(self, latitude, longitude):
         widget = self
         anim = Animation(
-            animated_latlon_property = Coordinate(latitude, longitude))
+            animated_latlon_property=Coordinate(latitude, longitude))
         anim.start(widget)
 
     def on_animated_latlon_property(self, instance, coordinate):
@@ -95,6 +99,7 @@ class CustomMapView(MapView):
         # self.center_on(latitude, longitude)
         self.animated_center_on(latitude, longitude)
 
+
 class MapViewScreen(Screen):
 
     status_message = StringProperty()
@@ -106,6 +111,7 @@ class MapViewScreen(Screen):
 
     def clean_status_message(self):
         self.update_status_message("")
+
 
 class Controller(RelativeLayout):
     mapview_screen_property = ObjectProperty()
@@ -119,13 +125,15 @@ class Controller(RelativeLayout):
 
     def bind_events(self):
         search_input = self.mapview_screen_property.search_input_property
-        search_input.bind(on_text_validate=lambda instance: self.on_search(search_input.text))
+        search_input.bind(
+            on_text_validate=lambda obj: self.on_search(search_input.text))
 
     def start_gps_localize(self):
         mapview_screen = self.mapview_screen_property
         mapview_screen.update_status_message("Waiting for GPS location...", 10)
         try:
-            gps.configure(on_location=self.on_location, on_status=self.on_status)
+            gps.configure(
+                on_location=self.on_location, on_status=self.on_status)
             gps.start()
         except NotImplementedError:
             message = "GPS not found."
@@ -162,7 +170,8 @@ class Controller(RelativeLayout):
             self.gps_marker.lon = longitude
         mapview.animated_center_on(latitude, longitude)
         mapview_screen.update_status_message(
-            "Latitude: %s / Longitude: %s" % (round(latitude, 2), round(longitude, 2)), 10)
+            "Latitude: %s / Longitude: %s" %
+            (round(latitude, 2), round(longitude, 2)), 10)
 
     def on_status(self, stype, status):
         mapview_screen = self.mapview_screen_property
@@ -170,7 +179,7 @@ class Controller(RelativeLayout):
             'type={}\n{}'.format(stype, status), 10)
 
     def on_search(self, text):
-        mapview_screen= self.mapview_screen_property
+        mapview_screen = self.mapview_screen_property
         mapview_screen.update_status_message("Looking for \"%s\"" % (text))
 
     def download_for_offline(self, text):
@@ -196,10 +205,11 @@ class Controller(RelativeLayout):
         filepath = os.path.join(MBTILES_DIRECTORY, filename)
         mb = MBTilesBuilder(filepath=filepath, cache=True)
         # changes geopy bounding box format to landez one
-        (min_lat, max_lat, min_lon, max_lon) = [float(x) for x in location.raw['boundingbox']]
+        (min_lat, max_lat, min_lon, max_lon) = \
+            [float(x) for x in location.raw['boundingbox']]
         bbox = (min_lon, min_lat, max_lon, max_lat)
         mb.add_coverage(bbox=bbox,
-            zoomlevels=[12, 13, 14, 15])
+                        zoomlevels=[12, 13, 14, 15])
         # mb.run()
         Thread(target=mb.run).start()
 
