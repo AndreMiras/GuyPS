@@ -24,6 +24,10 @@
             size: self.size
 
 <OfflineMapsScreen>:
+    offline_maps_spinner: offline_maps_spinner
+    # updates offline maps list
+    on_enter:
+        offline_maps_spinner.values = root.available_offline_maps()
     BoxLayout:
         id: layout_boxlayout
         orientation: 'vertical'
@@ -31,8 +35,8 @@
             multiline: False
             on_text_validate: app.controller.download_for_offline(self.text)
         Spinner:
+            id: offline_maps_spinner
             text: "Choose a offline map"
-            values: root.available_offline_maps()
             on_text:
                 app.controller.load_mbtiles(self.text)
                 root.manager.current = 'map'

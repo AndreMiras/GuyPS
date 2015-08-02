@@ -49,6 +49,8 @@ class GpsMarker(MapMarker):
 
 class OfflineMapsScreen(Screen):
 
+    offline_maps_spinner = ObjectProperty()
+
     def available_offline_maps(self):
         """
         Lists *.mbtiles files and returns their basename.
@@ -57,8 +59,6 @@ class OfflineMapsScreen(Screen):
         filepaths = glob.glob(filepath)
         filenames = [os.path.basename(x) for x in filepaths]
         return filenames
-
-    # on_text: load_mbtiles(self, mbtiles_path):
 
 
 class CustomMapView(MapView):
