@@ -1,5 +1,6 @@
 __version__ = '0.1'
 import os
+import glob
 import logging
 from kivy.garden.mapview import MapView, MapMarker, Coordinate
 from kivy.app import App
@@ -43,6 +44,18 @@ class GpsMarker(MapMarker):
     def on_lon(self, instance, value):
         self.update_position()
 
+class OfflineMapsScreen(Screen):
+    offline_maps_dropdown_property = ObjectProperty()
+
+    def available_offline_maps(self):
+        """
+        Lists *.mbtiles files and returns their basename.
+        """
+        filepath = os.path.join(MBTILES_DIRECTORY, '*.mbtiles')
+        filepaths = glob.glob(filepath)
+        filenames = [os.path.basename(x) for x in filepaths]
+        return filenames
+
 class CustomMapView(MapView):
 
     animated_latlon_property = ObjectProperty()
@@ -66,7 +79,6 @@ class CustomMapView(MapView):
 
     def on_touch_down(self, touch):
         if touch.is_double_tap:
-            latlon = self.get_latlon_at(touch.pos[0], touch.pos[1])
             self.animated_diff_scale_at(1, *touch.pos)
         return super(CustomMapView, self).on_touch_down(touch)
 

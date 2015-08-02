@@ -23,15 +23,17 @@
             pos: self.pos
             size: self.size
 
-<OfflineMapsScreen@Screen>:
+<OfflineMapsScreen>:
+
     BoxLayout:
+        id: layout_boxlayout
         orientation: 'vertical'
         TextInput:
-            id: search_input
             multiline: False
             on_text_validate: app.controller.download_for_offline(self.text)
-        Button:
-            text: 'My settings button'
+        Spinner:
+            text: "Choose a offline map"
+            values: root.available_offline_maps()
         Button:
             text: 'Back to map'
             on_press:
