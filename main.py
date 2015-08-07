@@ -217,8 +217,16 @@ class Controller(RelativeLayout):
         bbox = (min_lon, min_lat, max_lon, max_lat)
         mb.add_coverage(bbox=bbox,
                         zoomlevels=[12, 13, 14, 15])
-        # mb.run()
-        Thread(target=mb.run).start()
+        mb_run_thread = Thread(target=mb.run, kwargs={'force': False})
+        mb_run_thread.start()
+        Clock.schedule_interval(lambda dt: self.probe_mb_tiles_builder_thread(mb, mb_run_thread), 0.5)
+
+    def probe_mb_tiles_builder_thread(self, mb, mb_run_thread):
+        mapview_screen = self.mapview_screen_property
+        mapview_screen.update_status_message("Downloading tiles %s/%s" % (mb.rendered, mb.nbtiles), 10)
+        if not mb_run_thread.is_alive():
+            mapview_screen.update_status_message("Downloading tiles %s/%s" % (mb.nbtiles, mb.nbtiles), 10)
+            return False
 
     def load_mbtiles(self, mbtiles):
         mapview = self.mapview_property
