@@ -33,7 +33,10 @@
         orientation: 'vertical'
         TextInput:
             multiline: False
-            on_text_validate: app.controller.download_for_offline(self.text)
+            on_text_validate:
+                app.controller.download_for_offline(self.text)
+                root.manager.current = 'map'
+                root.manager.transition.direction = 'left'
         Spinner:
             id: offline_maps_spinner
             text: "Choose a offline map"
