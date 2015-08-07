@@ -216,6 +216,10 @@ class Controller(RelativeLayout):
             os.makedirs(MBTILES_DIRECTORY)
         filename = city + '.mbtiles'
         filepath = os.path.join(MBTILES_DIRECTORY, filename)
+        if os.path.exists(filepath):
+            mapview_screen = self.mapview_screen_property
+            mapview_screen.update_status_message("File already exists: %s" % (filename), 10)
+            return
         mb = MBTilesBuilder(filepath=filepath, cache=True)
         # changes geopy bounding box format to landez one
         (min_lat, max_lat, min_lon, max_lon) = \
