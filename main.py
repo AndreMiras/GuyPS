@@ -114,9 +114,15 @@ class MapViewScreen(Screen):
 
     def update_status_message(self, text, lifetime=3):
         self.status_message = text
-        Clock.schedule_once(lambda dt: self.clean_status_message(), lifetime)
+        # http://kivy.org/docs/api-kivy.clock.html
+        # You cannot unschedule an anonymous function unless you keep
+        # a reference to it.
+        # It's better to add *args to your function definition
+        # so that it can be called with an arbitrary number of parameters.
+        Clock.unschedule(self.clean_status_message)
+        Clock.schedule_once(self.clean_status_message, lifetime)
 
-    def clean_status_message(self):
+    def clean_status_message(self, dt):
         self.update_status_message("")
 
 
