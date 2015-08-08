@@ -253,4 +253,8 @@ class MapViewApp(App):
         self.controller = Controller()
         return self.controller
 
+    def on_pause(self):
+        # do not be close the application completely
+        return True
+
 MapViewApp().run()
