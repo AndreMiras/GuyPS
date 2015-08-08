@@ -210,6 +210,9 @@ class Controller(RelativeLayout):
                         body="Only cities are allowed.")
             popup.open()
             return
+        # move to the downloading location
+        mapview = self.mapview_property
+        mapview.animated_center_on(location.latitude, location.longitude)
         # exctracts the city from the address string
         city = location.address.split(',')[0]
         if not os.path.exists(MBTILES_DIRECTORY):
