@@ -1,5 +1,6 @@
 #:import find kivy.resources
 #:import MapSource mapview.MapSource
+#:import awesomarkup awesomarkup.awesomarkup
 
 <Toolbar@BoxLayout>:
     size_hint_y: None
@@ -64,7 +65,7 @@
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         ToggleButton:
-            text: u'[font=static/fonts/fontawesome-4.3.0-webfont.ttf]\uf041[/font] GPS'
+            text: u'%s GPS' % awesomarkup('fa-map-marker')
             markup: True
             on_state:
                 root.manager.current = 'map'
@@ -120,8 +121,8 @@
         Button:
             size_hint_x: None
             width: '48dp'
-            font_name: find.resource_find('static/fonts/fontawesome-4.3.0-webfont.ttf')
-            text: unichr(0xf0c9)
+            text: u'%s' % awesomarkup('fa-bars')
+            markup: True
             on_press:
                 root.manager.current = 'menu'
                 root.manager.transition.direction = 'right'
