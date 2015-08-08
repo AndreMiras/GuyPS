@@ -64,8 +64,8 @@
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         ToggleButton:
-            font_name: find.resource_find('static/fonts/fontawesome-4.3.0-webfont.ttf')
-            text: unichr(0xf041)
+            text: u'[font=static/fonts/fontawesome-4.3.0-webfont.ttf]\uf041[/font] GPS'
+            markup: True
             on_state:
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
