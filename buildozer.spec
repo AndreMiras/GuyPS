@@ -44,9 +44,10 @@ garden_requirements = mapview
 
 # (str) Presplash of the application
 #presplash.filename = %(source.dir)s/data/presplash.png
+presplash.filename = %(source.dir)s/static/img/flat_map.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/data/icon.png
+icon.filename = %(source.dir)s/static/img/flat_map.png
 
 # (str) Supported orientation (one of landscape, portrait or all)
 orientation = all
