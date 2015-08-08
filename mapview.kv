@@ -46,12 +46,14 @@
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         Button:
-            text: 'Back to map'
+            text: u'%s Back to map' % awesomarkup('fa-map')
+            markup: True
             on_press:
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         Button:
-            text: 'Back to menu'
+            text: u'%s Back to menu' % awesomarkup('fa-bars')
+            markup: True
             on_press:
                 root.manager.current = 'menu'
                 root.manager.transition.direction = 'left'
@@ -60,7 +62,8 @@
     BoxLayout:
         orientation: 'vertical'
         Button:
-            text: 'Back to map'
+            text: u'%s Back to map' % awesomarkup('fa-map')
+            markup: True
             on_press:
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
@@ -73,12 +76,14 @@
                 start = self.state == 'down'
                 app.controller.toggle_gps_localize(start)
         Button:
-            text: 'Offline maps'
+            text: u'%s Offline maps' % awesomarkup('fa-download')
+            markup: True
             on_press:
                 root.manager.current = 'offline_maps'
                 root.manager.transition.direction = 'right'
         Button:
-            text: 'Goto settings'
+            text: u'%s Settings' % awesomarkup('fa-cogs')
+            markup: True
             on_press: root.manager.current = 'settings'
 
 <SettingsScreen@Screen>:
@@ -87,12 +92,14 @@
         Button:
             text: 'My settings button'
         Button:
-            text: 'Back to map'
+            text: u'%s Back to map' % awesomarkup('fa-map')
+            markup: True
             on_press:
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         Button:
-            text: 'Back to menu'
+            text: u'%s Back to menu' % awesomarkup('fa-bars')
+            markup: True
             on_press:
                 root.manager.current = 'menu'
                 root.manager.transition.direction = 'left'

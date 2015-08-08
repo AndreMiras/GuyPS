@@ -1,7 +1,9 @@
 FONT_PATH = 'static/fonts/fontawesome-4.4.0-webfont.ttf'
 
 class_unicode = {
+    'fa-download': u'\uf019',
     'fa-map-marker': u'\uf041',
+    'fa-cogs': u'\uf085',
     'fa-bars': u'\uf0c9',
     'fa-map-pin': u'\uf276',
     'fa-map-o': u'\uf278',
