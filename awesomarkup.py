@@ -1,4 +1,4 @@
-FONT_PATH = 'static/fonts/fontawesome-4.3.0-webfont.ttf'
+FONT_PATH = 'static/fonts/fontawesome-4.4.0-webfont.ttf'
 
 class_unicode = {
     'fa-map-marker': u'\uf041',
