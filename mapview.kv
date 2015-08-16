@@ -42,23 +42,28 @@
                     on_press:
                         root.manager.current = 'map'
                         root.manager.transition.direction = 'left'
-        TextInput:
-            multiline: False
-            on_text_validate:
-                app.controller.download_for_offline(self.text)
-                root.manager.current = 'map'
-                root.manager.transition.direction = 'left'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '48dp'
+            padding: '4dp'
+            spacing: '4dp'
+            Label:
+                text: 'Download:'
+                size_hint: None, None
+                size: self.texture_size
+            TextInput:
+                multiline: False
+                on_text_validate:
+                    app.controller.download_for_offline(self.text)
+                    root.manager.current = 'map'
+                    root.manager.transition.direction = 'left'
         Spinner:
             id: offline_maps_spinner
-            text: "Choose a offline map"
+            text: "%s Available offline maps" % awesomarkup('fa-map')
+            markup: True
             on_text:
                 app.controller.load_mbtiles(self.text)
-                root.manager.current = 'map'
-                root.manager.transition.direction = 'left'
-        Button:
-            text: u'%s Back to map' % awesomarkup('fa-map')
-            markup: True
-            on_press:
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         Button:
