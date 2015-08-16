@@ -61,12 +61,16 @@
 <MenuScreen@Screen>:
     BoxLayout:
         orientation: 'vertical'
-        Button:
-            text: u'%s Back to map' % awesomarkup('fa-map')
-            markup: True
-            on_press:
-                root.manager.current = 'map'
-                root.manager.transition.direction = 'left'
+        ActionBar:
+            pos_hint: {'top': 1}
+            ActionView:
+                use_separator: True
+                ActionPrevious:
+                    title: 'Menu'
+                    with_previous: True
+                    on_press:
+                        root.manager.current = 'map'
+                        root.manager.transition.direction = 'left'
         ToggleButton:
             text: u'%s GPS' % awesomarkup('fa-map-marker')
             markup: True
@@ -81,28 +85,6 @@
             on_press:
                 root.manager.current = 'offline_maps'
                 root.manager.transition.direction = 'right'
-        Button:
-            text: u'%s Settings' % awesomarkup('fa-cogs')
-            markup: True
-            on_press: root.manager.current = 'settings'
-
-<SettingsScreen@Screen>:
-    BoxLayout:
-        orientation: 'vertical'
-        Button:
-            text: 'My settings button'
-        Button:
-            text: u'%s Back to map' % awesomarkup('fa-map')
-            markup: True
-            on_press:
-                root.manager.current = 'map'
-                root.manager.transition.direction = 'left'
-        Button:
-            text: u'%s Back to menu' % awesomarkup('fa-bars')
-            markup: True
-            on_press:
-                root.manager.current = 'menu'
-                root.manager.transition.direction = 'left'
 
 <MapViewScreen>:
     search_input_property: search_input
@@ -169,7 +151,3 @@
         OfflineMapsScreen:
             id: offline_maps_screen
             name: 'offline_maps'
-
-        SettingsScreen:
-            id: settings_screen
-            name: 'settings'
