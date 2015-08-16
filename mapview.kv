@@ -32,6 +32,16 @@
     BoxLayout:
         id: layout_boxlayout
         orientation: 'vertical'
+        ActionBar:
+            pos_hint: {'top': 1}
+            ActionView:
+                use_separator: True
+                ActionPrevious:
+                    title: 'Offline maps'
+                    with_previous: True
+                    on_press:
+                        root.manager.current = 'map'
+                        root.manager.transition.direction = 'left'
         TextInput:
             multiline: False
             on_text_validate:
