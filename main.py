@@ -17,7 +17,6 @@ from landez import MBTilesBuilder
 
 
 __version__ = '0.1'
-MBTILES_DIRECTORY = 'mbtiles'
 logging.basicConfig(level=logging.DEBUG)
 app = None
 
@@ -55,7 +54,7 @@ class OfflineMapsScreen(Screen):
         """
         Lists *.mbtiles files and returns their basename.
         """
-        filepath = os.path.join(MBTILES_DIRECTORY, '*.mbtiles')
+        filepath = os.path.join(App.get_running_app().mbtiles_directory, '*.mbtiles')
         filepaths = glob.glob(filepath)
         filenames = [os.path.basename(x) for x in filepaths]
         return filenames
@@ -102,7 +101,7 @@ class CustomMapView(MapView):
         self.animated_center_on(latitude, longitude)
 
     def load_mbtiles(self, mbtiles):
-        mbtiles_path = os.path.join(MBTILES_DIRECTORY, mbtiles)
+        mbtiles_path = os.path.join(App.get_running_app().mbtiles_directory, mbtiles)
         map_source = MBTilesMapSource(mbtiles_path)
         self.map_source = map_source
 
@@ -215,10 +214,10 @@ class Controller(RelativeLayout):
         mapview.animated_center_on(location.latitude, location.longitude)
         # exctracts the city from the address string
         city = location.address.split(',')[0]
-        if not os.path.exists(MBTILES_DIRECTORY):
-            os.makedirs(MBTILES_DIRECTORY)
+        if not os.path.exists(App.get_running_app().mbtiles_directory):
+            os.makedirs(App.get_running_app().mbtiles_directory)
         filename = city + '.mbtiles'
-        filepath = os.path.join(MBTILES_DIRECTORY, filename)
+        filepath = os.path.join(App.get_running_app().mbtiles_directory, filename)
         if os.path.exists(filepath):
             mapview_screen = self.mapview_screen_property
             mapview_screen.update_status_message("File already exists: %s" % (filename), 10)
@@ -256,5 +255,9 @@ class MapViewApp(App):
     def on_pause(self):
         # do not be close the application completely
         return True
+
+    @property
+    def mbtiles_directory(self):
+        return os.path.join(self.user_data_dir, 'mbtiles')
 
 MapViewApp().run()
