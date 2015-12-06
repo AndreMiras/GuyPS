@@ -1,5 +1,5 @@
 # GuyPS
 A GPS application for Guy written on top of Kivy
 
-## Deploy on Android
-    buildozer android run
+## Compile, deploy & run on Android
+    buildozer -v android debug deploy run logcat
