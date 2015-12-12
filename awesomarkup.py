@@ -1,5 +1,10 @@
-FONT_PATH = 'static/fonts/fontawesome-4.4.0-webfont.ttf'
+import os
+import xstatic.pkg.font_awesome
 
+
+FONT_PATH = os.path.join(
+        xstatic.pkg.font_awesome.BASE_DIR,
+        'fonts/fontawesome-webfont.ttf')
 class_unicode = {
     'fa-download': u'\uf019',
     'fa-map-marker': u'\uf041',

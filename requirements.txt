@@ -6,3 +6,4 @@ pygame===1.9.1release
 Pillow==2.9.0
 geopy==1.10.0
 plyer==1.2.4
+https://github.com/AndreMiras/xstatic-font-awesome/archive/4.5.0.0.tar.gz
