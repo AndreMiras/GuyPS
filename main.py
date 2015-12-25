@@ -51,7 +51,8 @@ class OfflineMapsScreen(Screen):
         """
         Lists *.mbtiles files and returns their basename.
         """
-        filepath = os.path.join(App.get_running_app().mbtiles_directory, '*.mbtiles')
+        filepath = os.path.join(
+            App.get_running_app().mbtiles_directory, '*.mbtiles')
         filepaths = glob.glob(filepath)
         filenames = [os.path.basename(x) for x in filepaths]
         return filenames
@@ -98,7 +99,8 @@ class CustomMapView(MapView):
         self.animated_center_on(latitude, longitude)
 
     def load_mbtiles(self, mbtiles):
-        mbtiles_path = os.path.join(App.get_running_app().mbtiles_directory, mbtiles)
+        mbtiles_path = os.path.join(
+            App.get_running_app().mbtiles_directory, mbtiles)
         map_source = MBTilesMapSource(mbtiles_path)
         self.map_source = map_source
 
@@ -214,15 +216,18 @@ class Controller(RelativeLayout):
         if not os.path.exists(App.get_running_app().mbtiles_directory):
             os.makedirs(App.get_running_app().mbtiles_directory)
         filename = city + '.mbtiles'
-        filepath = os.path.join(App.get_running_app().mbtiles_directory, filename)
+        filepath = os.path.join(
+            App.get_running_app().mbtiles_directory, filename)
         if os.path.exists(filepath):
             popup = ConfirmPopup(
                 title="File already exists",
                 text="File already exists.\nDo you want to override?")
-            popup.bind(on_yes=lambda obj: self.download_for_offline(filepath, location, delete=True))
+            popup.bind(on_yes=lambda obj: self.download_for_offline(
+                filepath, location, delete=True))
             popup.open()
             mapview_screen = self.mapview_screen_property
-            mapview_screen.update_status_message("File already exists: %s" % (filename), 10)
+            mapview_screen.update_status_message(
+                "File already exists: %s" % (filename), 10)
             return
         self.download_for_offline(filepath, location)
 
@@ -238,13 +243,17 @@ class Controller(RelativeLayout):
                         zoomlevels=[12, 13, 14, 15])
         mb_run_thread = Thread(target=mb.run, kwargs={'force': False})
         mb_run_thread.start()
-        Clock.schedule_interval(lambda dt: self.probe_mb_tiles_builder_thread(mb, mb_run_thread), 0.5)
+        Clock.schedule_interval(
+            lambda dt: self.probe_mb_tiles_builder_thread(
+                mb, mb_run_thread), 0.5)
 
     def probe_mb_tiles_builder_thread(self, mb, mb_run_thread):
         mapview_screen = self.mapview_screen_property
-        mapview_screen.update_status_message("Downloading tiles %s/%s" % (mb.rendered, mb.nbtiles), 10)
+        mapview_screen.update_status_message(
+            "Downloading tiles %s/%s" % (mb.rendered, mb.nbtiles), 10)
         if not mb_run_thread.is_alive():
-            mapview_screen.update_status_message("Downloading tiles %s/%s" % (mb.nbtiles, mb.nbtiles), 10)
+            mapview_screen.update_status_message(
+                "Downloading tiles %s/%s" % (mb.nbtiles, mb.nbtiles), 10)
             return False
 
     def load_mbtiles(self, mbtiles):
