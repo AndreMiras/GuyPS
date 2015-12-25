@@ -55,7 +55,7 @@
             TextInput:
                 multiline: False
                 on_text_validate:
-                    app.controller.download_for_offline(self.text)
+                    app.controller.prepare_download_for_offline(self.text)
                     root.manager.current = 'map'
                     root.manager.transition.direction = 'left'
         Spinner:
@@ -148,6 +148,31 @@
         self.dismiss()
     Label:
         text: root.body
+
+<ConfirmPopup>:
+    size_hint: .5, .5
+    auto_dismiss: True
+    title: root.title
+    on_touch_down:
+        self.dismiss()
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: root.text
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '44sp'
+            Button:
+                text: 'Yes'
+                on_release:
+                    root.dispatch('on_answer','yes')
+                    root.dispatch('on_yes')
+            Button:
+                text: 'No'
+                on_release:
+                    root.dispatch('on_answer','no')
+                    root.dispatch('on_no')
 
 # RelativeLayout:
 <Controller>:

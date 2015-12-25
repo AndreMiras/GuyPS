@@ -26,6 +26,26 @@ class PopupMessage(Popup):
     body = StringProperty()
 
 
+class ConfirmPopup(Popup):
+    title = StringProperty()
+    text = StringProperty()
+
+    def __init__(self,**kwargs):
+        self.register_event_type('on_answer')
+        self.register_event_type('on_yes')
+        self.register_event_type('on_no')
+        super(ConfirmPopup, self).__init__(**kwargs)
+
+    def on_answer(self, *args):
+        pass
+
+    def on_yes(self, *args):
+        pass
+
+    def on_no(self, *args):
+        pass
+
+
 class GpsMarker(MapMarker):
 
     def update_position(self):
@@ -194,7 +214,7 @@ class Controller(RelativeLayout):
         mapview_screen = self.mapview_screen_property
         mapview_screen.update_status_message("Looking for \"%s\"" % (text))
 
-    def download_for_offline(self, text):
+    def prepare_download_for_offline(self, text):
         geolocator = Nominatim()
         location = geolocator.geocode(text)
         if location is None:
@@ -219,9 +239,19 @@ class Controller(RelativeLayout):
         filename = city + '.mbtiles'
         filepath = os.path.join(App.get_running_app().mbtiles_directory, filename)
         if os.path.exists(filepath):
+            popup = ConfirmPopup(
+                title="File already exists",
+                text="File already exists.\nDo you want to override?")
+            popup.bind(on_yes=lambda obj: self.download_for_offline(filepath, location, delete=True))
+            popup.open()
             mapview_screen = self.mapview_screen_property
             mapview_screen.update_status_message("File already exists: %s" % (filename), 10)
             return
+        self.download_for_offline(filepath, location)
+
+    def download_for_offline(self, filepath, location, delete=False):
+        if delete:
+            os.remove(filepath)
         mb = MBTilesBuilder(filepath=filepath, cache=True)
         # changes geopy bounding box format to landez one
         (min_lat, max_lat, min_lon, max_lon) = \
