@@ -1,5 +1,7 @@
 # GuyPS
-A GPS application for Guy written on top of Kivy
+A GPS application for Guy written on top of Kivy.
+
+![Screenshot](https://raw.githubusercontent.com/AndreMiras/GuyPS/master/screenshots/preview_nexus7.png)
 
 ## Install dependencies
 
