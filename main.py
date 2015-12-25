@@ -2,7 +2,7 @@ import os
 import glob
 import logging
 from threading import Thread
-from kivy.garden.mapview import MapView, MapMarker, Coordinate
+from kivy.garden.mapview import MapView, MapMarker, Coordinate, MapSource
 from kivy.garden.mapview.mapview.mbtsource import MBTilesMapSource
 from kivy.app import App
 from kivy.clock import Clock
@@ -56,6 +56,14 @@ class OfflineMapsScreen(Screen):
         filenames = [os.path.basename(x) for x in filepaths]
         return filenames
 
+    def offline_maps_spinner_values(self):
+        """
+        Adds "Online map" value to offline maps spinner.
+        """
+        maps = ["Online map"]
+        maps += self.available_offline_maps()
+        return maps
+
 
 class CustomMapView(MapView):
 
@@ -102,6 +110,12 @@ class CustomMapView(MapView):
             App.get_running_app().mbtiles_directory, mbtiles)
         map_source = MBTilesMapSource(mbtiles_path)
         self.map_source = map_source
+
+    def load_default_map_source(self):
+        """
+        Switch back to default MapSource online map.
+        """
+        self.map_source = MapSource()
 
 
 class MapViewScreen(Screen):
@@ -258,6 +272,16 @@ class Controller(RelativeLayout):
     def load_mbtiles(self, mbtiles):
         mapview = self.mapview_property
         mapview.load_mbtiles(mbtiles)
+
+    def load_map(self, name):
+        """
+        Either loads default online map or mbtiles local map.
+        """
+        mapview = self.mapview_property
+        if name == "Online map":
+            mapview.load_default_map_source()
+        else:
+            self.load_mbtiles(name)
 
 
 class MapViewApp(App):
