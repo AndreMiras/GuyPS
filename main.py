@@ -6,7 +6,6 @@ from kivy.garden.mapview import MapView, MapMarker, Coordinate
 from kivy.garden.mapview.mapview.mbtsource import MBTilesMapSource
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.uix.popup import Popup
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty, ObjectProperty
