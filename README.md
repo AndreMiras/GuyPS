@@ -24,3 +24,7 @@ Then requirements from requirements.txt can be installed.
 ## Compile, deploy & run on Android
 
     buildozer -v android debug deploy run logcat
+
+## Motivations
+
+My father-in-law needed an offline map app and I didn't know a decent one. This was the fake reason, the actual reason is I wanted to give Kivy a try and found this application was a great playground.
