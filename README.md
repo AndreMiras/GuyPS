@@ -1,6 +1,8 @@
 # GuyPS
 A GPS application for Guy written on top of Kivy.
 
+The application gives access to offline maps. It runs on different operating systems and devices.
+
 ![Screenshot](https://raw.githubusercontent.com/AndreMiras/GuyPS/master/screenshots/preview_nexus7.png)
 
 ## Install dependencies
