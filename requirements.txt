@@ -8,4 +8,3 @@ geopy==1.10.0
 plyer==1.2.4
 landez==2.3.0
 buildozer==0.30
-https://github.com/AndreMiras/xstatic-font-awesome/archive/4.5.0.0.tar.gz
