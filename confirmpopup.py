@@ -1,3 +1,7 @@
+"""
+Makes it easy to create simple confirmation dialog.
+The dialog contains title, message body and yes/no button.
+"""
 from kivy.uix.popup import Popup
 from kivy.properties import StringProperty
 
