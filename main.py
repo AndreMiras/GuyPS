@@ -223,6 +223,15 @@ class Controller(RelativeLayout):
         mapview_screen = self.mapview_screen_property
         mapview_screen.update_status_message("Looking for \"%s\"" % (text))
 
+    def geopy_bbox_to_bbox(self, geopy_bbox):
+        """
+        Changes geopy bbox to mbtiles bbox.
+        """
+        # bottom, top, left, right
+        (min_lat, max_lat, min_lon, max_lon) = [float(x) for x in geopy_bbox]
+        bbox = (min_lon, min_lat, max_lon, max_lat)
+        return bbox
+
     def prepare_download_for_offline(self, text):
         geolocator = Nominatim()
         location = geolocator.geocode(text)
@@ -243,6 +252,9 @@ class Controller(RelativeLayout):
         mapview.animated_center_on(location.latitude, location.longitude)
         # exctracts the city from the address string
         city = location.address.split(',')[0]
+        # changes geopy bounding box format to landez one
+        geopy_bbox = location.raw['boundingbox']
+        bbox = self.geopy_bbox_to_bbox(geopy_bbox)
         if not os.path.exists(App.get_running_app().mbtiles_directory):
             os.makedirs(App.get_running_app().mbtiles_directory)
         filename = city + '.mbtiles'
@@ -253,24 +265,18 @@ class Controller(RelativeLayout):
                 title="File already exists",
                 text="File already exists.\nDo you want to override?")
             popup.bind(on_yes=lambda obj: self.download_for_offline(
-                filepath, location, delete=True))
+                filepath, bbox, delete=True))
             popup.open()
             mapview_screen = self.mapview_screen_property
             mapview_screen.update_status_message(
                 "File already exists: %s" % (filename), 10)
             return
-        self.download_for_offline(filepath, location)
+        self.download_for_offline(filepath, bbox)
 
-    def download_for_offline(self, filepath, location, delete=False):
+    def download_for_offline(self, filepath, bbox, delete=False):
         if delete:
             os.remove(filepath)
         mb = MBTilesBuilder(filepath=filepath, cache=True)
-        # changes geopy bounding box format to landez one
-        # bottom, top, left, right
-        (min_lat, max_lat, min_lon, max_lon) = \
-            [float(x) for x in location.raw['boundingbox']]
-        # left, bottom, right, top
-        bbox = (min_lon, min_lat, max_lon, max_lat)
         mb.add_coverage(bbox=bbox,
                         zoomlevels=[12, 13, 14, 15])
         mb_run_thread = Thread(target=mb.run, kwargs={'force': False})
