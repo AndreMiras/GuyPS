@@ -3,7 +3,6 @@ import glob
 import logging
 from threading import Thread
 from kivy.garden.mapview import MapView, MapMarker, Coordinate, MapSource
-from kivy.garden.mapview.mapview.mbtsource import MBTilesMapSource
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.relativelayout import RelativeLayout
@@ -115,13 +114,11 @@ class CustomMapView(MapView):
         mbtiles_path = os.path.join(
             App.get_running_app().mbtiles_directory, mbtiles)
         map_source = MBTilesCompositeMapSource(mbtiles_paths)
-        # map_source = MBTilesMapSource(mbtiles_path)
         self.map_source = map_source
         mbreader = MBTilesReader(mbtiles_path)
         # centers on requested loaded mbtiles
         metadata = mbreader.metadata()
         if "center" in metadata:
-            center = metadata['center']
             longitude, latitude, zoom = map(float, metadata["center"].split(","))
         self.animated_center_on(latitude, longitude)
         # TODO: highest zoom level of the loaded one
@@ -232,7 +229,11 @@ class Controller(RelativeLayout):
         bbox = (min_lon, min_lat, max_lon, max_lat)
         return bbox
 
-    def prepare_download_for_offline(self, text):
+    def prepare_download_for_offline1(self, text):
+        """
+        Verifes location requested for download is valid,
+        i.e. exists and is allowed (city only).
+        """
         geolocator = Nominatim()
         location = geolocator.geocode(text)
         if location is None:
@@ -254,10 +255,18 @@ class Controller(RelativeLayout):
         city = location.address.split(',')[0]
         # changes geopy bounding box format to landez one
         geopy_bbox = location.raw['boundingbox']
+        filename = city + '.mbtiles'
         bbox = self.geopy_bbox_to_bbox(geopy_bbox)
+        zoomlevels = [12, 13, 14, 15]
+        self.prepare_download_for_offline2(filename, bbox, zoomlevels)
+
+    def prepare_download_for_offline2(self, filename, bbox, zoomlevels):
+        """
+        Verifies the file system is ready for this download.
+        Checks the directory are created, verifies if the file already exists.
+        """
         if not os.path.exists(App.get_running_app().mbtiles_directory):
             os.makedirs(App.get_running_app().mbtiles_directory)
-        filename = city + '.mbtiles'
         filepath = os.path.join(
             App.get_running_app().mbtiles_directory, filename)
         if os.path.exists(filepath):
@@ -265,20 +274,23 @@ class Controller(RelativeLayout):
                 title="File already exists",
                 text="File already exists.\nDo you want to override?")
             popup.bind(on_yes=lambda obj: self.download_for_offline(
-                filepath, bbox, delete=True))
+                filepath, bbox, zoomlevels, delete=True))
             popup.open()
             mapview_screen = self.mapview_screen_property
             mapview_screen.update_status_message(
                 "File already exists: %s" % (filename), 10)
             return
-        self.download_for_offline(filepath, bbox)
+        self.download_for_offline(filepath, bbox, zoomlevels)
 
-    def download_for_offline(self, filepath, bbox, delete=False):
+    def download_for_offline(self, filepath, bbox, zoomlevels, delete=False):
+        """
+        Starts the actual download and probes the progress.
+        """
         if delete:
             os.remove(filepath)
         mb = MBTilesBuilder(filepath=filepath, cache=True)
         mb.add_coverage(bbox=bbox,
-                        zoomlevels=[12, 13, 14, 15])
+                        zoomlevels=zoomlevels)
         mb_run_thread = Thread(target=mb.run, kwargs={'force': False})
         mb_run_thread.start()
         Clock.schedule_interval(
@@ -307,6 +319,10 @@ class Controller(RelativeLayout):
             mapview.load_default_map_source()
         else:
             self.load_mbtiles(name)
+
+    def download_world_map(self):
+        mapview = self.mapview_property
+        mapview.download_world_map()
 
 
 class MapViewApp(App):
