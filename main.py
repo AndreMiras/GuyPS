@@ -22,6 +22,9 @@ __version__ = '0.1'
 logging.basicConfig(level=logging.DEBUG)
 app = None
 
+OFFLINE_MIN_ZOOM = 12
+OFFLINE_MAX_ZOOM = 15
+
 
 class GpsMarker(MapMarker):
 
@@ -113,9 +116,9 @@ class CustomMapView(MapView):
         if "center" in metadata:
             longitude, latitude, zoom = map(float, metadata["center"].split(","))
         self.animated_center_on(latitude, longitude)
-        # TODO: highest zoom level of the loaded one
-        # min_zoom = int(metadata.get("minzoom", 12))
-        # mbreader.zoomlevels()
+        # defaults to the minimum available zoom
+        min_zoom = int(metadata.get("minzoom", OFFLINE_MIN_ZOOM))
+        self.zoom = min_zoom
 
     def load_default_map_source(self):
         """
@@ -249,7 +252,7 @@ class Controller(RelativeLayout):
         geopy_bbox = location.raw['boundingbox']
         filename = city + '.mbtiles'
         bbox = self.geopy_bbox_to_bbox(geopy_bbox)
-        zoomlevels = range(12, 15+1)
+        zoomlevels = range(OFFLINE_MIN_ZOOM, OFFLINE_MAX_ZOOM+1)
         self.prepare_download_for_offline2(filename, bbox, zoomlevels)
 
     def prepare_download_for_offline2(self, filename, bbox, zoomlevels):
