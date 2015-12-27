@@ -257,7 +257,7 @@ class Controller(RelativeLayout):
         geopy_bbox = location.raw['boundingbox']
         filename = city + '.mbtiles'
         bbox = self.geopy_bbox_to_bbox(geopy_bbox)
-        zoomlevels = [12, 13, 14, 15]
+        zoomlevels = range(12, 15+1)
         self.prepare_download_for_offline2(filename, bbox, zoomlevels)
 
     def prepare_download_for_offline2(self, filename, bbox, zoomlevels):
@@ -297,6 +297,15 @@ class Controller(RelativeLayout):
             lambda dt: self.probe_mb_tiles_builder_thread(
                 mb, mb_run_thread), 0.5)
 
+    def download_world_map(self):
+        """
+        Downloads the first few zoom levels of world map.
+        """
+        filename = 'World.mbtiles'
+        bbox = (-179.0, -89.0, 179.0, 89.0)
+        zoomlevels = range(0, 5+1)
+        self.prepare_download_for_offline2(filename, bbox, zoomlevels)
+
     def probe_mb_tiles_builder_thread(self, mb, mb_run_thread):
         mapview_screen = self.mapview_screen_property
         mapview_screen.update_status_message(
@@ -319,10 +328,6 @@ class Controller(RelativeLayout):
             mapview.load_default_map_source()
         else:
             self.load_mbtiles(name)
-
-    def download_world_map(self):
-        mapview = self.mapview_property
-        mapview.download_world_map()
 
 
 class MapViewApp(App):

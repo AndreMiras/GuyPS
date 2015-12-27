@@ -57,7 +57,7 @@
             TextInput:
                 multiline: False
                 on_text_validate:
-                    app.controller.prepare_download_for_offline(self.text)
+                    app.controller.prepare_download_for_offline1(self.text)
                     root.manager.current = 'map'
                     root.manager.transition.direction = 'left'
         Spinner:
@@ -66,6 +66,13 @@
             markup: True
             on_text:
                 app.controller.load_map(self.text)
+                root.manager.current = 'map'
+                root.manager.transition.direction = 'left'
+        Button:
+            text: u'%s Download world map' % awesomarkup('fa-globe')
+            markup: True
+            on_press:
+                app.controller.download_world_map()
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         Button:
