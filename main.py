@@ -13,8 +13,10 @@ from kivy.animation import Animation
 from plyer import gps
 from geopy.geocoders import Nominatim
 from landez import MBTilesBuilder
+from landez.sources import MBTilesReader
 from popupmessage import PopupMessage
 from confirmpopup import ConfirmPopup
+from mbtcsource import MBTilesCompositeMapSource
 
 
 __version__ = '0.1'
@@ -50,9 +52,7 @@ class OfflineMapsScreen(Screen):
         """
         Lists *.mbtiles files and returns their basename.
         """
-        filepath = os.path.join(
-            App.get_running_app().mbtiles_directory, '*.mbtiles')
-        filepaths = glob.glob(filepath)
+        filepaths = App.get_running_app().mbtiles_paths
         filenames = [os.path.basename(x) for x in filepaths]
         return filenames
 
@@ -106,10 +106,27 @@ class CustomMapView(MapView):
         self.animated_center_on(latitude, longitude)
 
     def load_mbtiles(self, mbtiles):
+        """
+        Loads all the downloaded *.mbtiles, but centers on the requested one.
+        """
+        # downloaded *.mbtiles paths
+        mbtiles_paths = App.get_running_app().mbtiles_paths
+        # requested mbtiles path
         mbtiles_path = os.path.join(
             App.get_running_app().mbtiles_directory, mbtiles)
-        map_source = MBTilesMapSource(mbtiles_path)
+        map_source = MBTilesCompositeMapSource(mbtiles_paths)
+        # map_source = MBTilesMapSource(mbtiles_path)
         self.map_source = map_source
+        mbreader = MBTilesReader(mbtiles_path)
+        # centers on requested loaded mbtiles
+        metadata = mbreader.metadata()
+        if "center" in metadata:
+            center = metadata['center']
+            longitude, latitude, zoom = map(float, metadata["center"].split(","))
+        self.animated_center_on(latitude, longitude)
+        # TODO: highest zoom level of the loaded one
+        # min_zoom = int(metadata.get("minzoom", 12))
+        # mbreader.zoomlevels()
 
     def load_default_map_source(self):
         """
@@ -249,8 +266,10 @@ class Controller(RelativeLayout):
             os.remove(filepath)
         mb = MBTilesBuilder(filepath=filepath, cache=True)
         # changes geopy bounding box format to landez one
+        # bottom, top, left, right
         (min_lat, max_lat, min_lon, max_lon) = \
             [float(x) for x in location.raw['boundingbox']]
+        # left, bottom, right, top
         bbox = (min_lon, min_lat, max_lon, max_lat)
         mb.add_coverage(bbox=bbox,
                         zoomlevels=[12, 13, 14, 15])
@@ -297,6 +316,19 @@ class MapViewApp(App):
 
     @property
     def mbtiles_directory(self):
+        """
+        Returns the mbtiles directory.
+        """
         return os.path.join(self.user_data_dir, 'mbtiles')
+
+    @property
+    def mbtiles_paths(self):
+        """
+        Returns the list of mbtiles files paths.
+        """
+        filepath = os.path.join(
+            self.mbtiles_directory, '*.mbtiles')
+        filepaths = glob.glob(filepath)
+        return filepaths
 
 MapViewApp().run()
