@@ -55,14 +55,6 @@ class OfflineMapsScreen(Screen):
         filenames = [os.path.basename(x) for x in filepaths]
         return filenames
 
-    def offline_maps_spinner_values(self):
-        """
-        Adds "Online map" value to offline maps spinner.
-        """
-        maps = ["Online map"]
-        maps += self.available_offline_maps()
-        return maps
-
 
 class CustomMapView(MapView):
 
@@ -316,18 +308,18 @@ class Controller(RelativeLayout):
             return False
 
     def load_mbtiles(self, mbtiles):
+        """
+        Loads mbtiles local maps.
+        """
         mapview = self.mapview_property
         mapview.load_mbtiles(mbtiles)
 
-    def load_map(self, name):
+    def load_default_map_source(self):
         """
-        Either loads default online map or mbtiles local map.
+        Loads default online map.
         """
         mapview = self.mapview_property
-        if name == "Online map":
-            mapview.load_default_map_source()
-        else:
-            self.load_mbtiles(name)
+        mapview.load_default_map_source()
 
 
 class MapViewApp(App):

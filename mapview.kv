@@ -30,7 +30,7 @@
     offline_maps_spinner: offline_maps_spinner
     # updates offline maps list
     on_enter:
-        offline_maps_spinner.values = root.offline_maps_spinner_values()
+        offline_maps_spinner.values = root.available_offline_maps()
     BoxLayout:
         id: layout_boxlayout
         orientation: 'vertical'
@@ -65,7 +65,7 @@
             text: "%s Available offline maps" % awesomarkup('fa-map')
             markup: True
             on_text:
-                app.controller.load_map(self.text)
+                app.controller.load_mbtiles(self.text)
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         Button:
@@ -73,6 +73,13 @@
             markup: True
             on_press:
                 app.controller.download_world_map()
+                root.manager.current = 'map'
+                root.manager.transition.direction = 'left'
+        Button:
+            text: u'%s Back online' % awesomarkup('fa-signal')
+            markup: True
+            on_press:
+                app.controller.load_default_map_source()
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         Button:
