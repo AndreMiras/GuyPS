@@ -12,6 +12,7 @@ from kivy.properties import StringProperty, ObjectProperty, NumericProperty
 from kivy.animation import Animation
 from plyer import gps
 from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderServiceError
 from landez import MBTilesBuilder
 from landez.sources import MBTilesReader
 from popupmessage import PopupMessage
@@ -88,7 +89,14 @@ class CustomMapView(MapView):
 
     def search(self, text):
         geolocator = Nominatim()
-        location = geolocator.geocode(text)
+        try:
+            location = geolocator.geocode(text)
+        except GeocoderServiceError as e:
+            popup = PopupMessage(
+                        title="Error",
+                        body=e.message)
+            popup.open()
+            return
         if location is None:
             popup = PopupMessage(
                         title="Error",
