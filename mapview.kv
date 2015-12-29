@@ -4,7 +4,8 @@
 #:include popupmessage.kv
 #:include confirmpopup.kv
 
-<Toolbar@BoxLayout>:
+# <Toolbar@BoxLayout>:
+<Toolbar>:
     size_hint_y: None
     height: '48dp'
     padding: '4dp'
@@ -12,7 +13,7 @@
 
     canvas:
         Color:
-            rgba: .2, .2, .2, .6
+            rgba: .2, .2, .2, self.alpha_color
         Rectangle:
             pos: self.pos
             size: self.size
@@ -119,6 +120,7 @@
 
 <MapViewScreen>:
     search_input_property: search_input
+    status_bar_property: status_bar
 
     CustomMapView:
         id: mapview
