@@ -179,9 +179,9 @@ class Controller(RelativeLayout):
     def stop_gps_localize(self):
         mapview = self.mapview_property
         gps.stop()
-        # if self.gps_marker is None:
-        mapview.remove_marker(self.gps_marker)
-        self.gps_marker = None
+        if self.gps_marker is not None:
+            mapview.remove_marker(self.gps_marker)
+            self.gps_marker = None
 
     def toggle_gps_localize(self, start):
         if start:
