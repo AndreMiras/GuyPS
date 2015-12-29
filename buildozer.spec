@@ -91,6 +91,7 @@ android.minapi = 13
 
 # (list) python-for-android whitelist
 #android.p4a_whitelist =
+android.p4a_whitelist = lib-dynload/_csv.so
 
 # (str) Android entry point, default is ok for Kivy-based app
 #android.entrypoint = org.renpy.android.PythonActivity
