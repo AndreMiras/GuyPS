@@ -129,21 +129,28 @@ class CustomMapView(MapView):
 
 
 class Toolbar(BoxLayout):
+    MAX_ALPHA = 0.6
     alpha_color = NumericProperty()
 
     def __init__(self, **kwargs):
         super(Toolbar, self).__init__(**kwargs)
-        self.show()
+        self.show(animated=False)
 
-    def show(self):
-        widget = self
-        anim = Animation(alpha_color=0.6, duration=1)
-        anim.start(widget)
+    def show(self, animated=True):
+        if animated:
+            widget = self
+            anim = Animation(alpha_color=Toolbar.MAX_ALPHA, duration=1)
+            anim.start(widget)
+        else:
+            self.alpha_color = Toolbar.MAX_ALPHA
 
-    def hide(self):
-        widget = self
-        anim = Animation(alpha_color=0, duration=1)
-        anim.start(widget)
+    def hide(self, animated=True):
+        if animated:
+            widget = self
+            anim = Animation(alpha_color=0, duration=1)
+            anim.start(widget)
+        else:
+            self.alpha_color = 0
 
 
 class MapViewScreen(Screen):
@@ -155,7 +162,8 @@ class MapViewScreen(Screen):
     def __init__(self, **kwargs):
         super(MapViewScreen, self).__init__(**kwargs)
         # starts by default without the status message bar
-        Clock.schedule_once(self._clean_status_message, 0)
+        Clock.schedule_once(
+            lambda dt: self.status_bar_property.hide(animated=False), 0)
 
     def update_status_message(self, text, lifetime=3):
         self.status_bar_property.show()
