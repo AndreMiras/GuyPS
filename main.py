@@ -161,6 +161,21 @@ class Controller(RelativeLayout):
         search_input.bind(
             on_text_validate=lambda obj: self.on_search(search_input.text))
 
+    def gps_not_found_message(self):
+        """
+        Shows a "GPS not found" status bar and popup error message.
+        """
+        mapview_screen = self.mapview_screen_property
+        message = "GPS not found."
+        # status bar error message
+        mapview_screen.update_status_message(message)
+        # popup error message
+        popup = PopupMessage(
+                    title="Error",
+                    body=message)
+        popup.open()
+
+
     def start_gps_localize(self):
         mapview_screen = self.mapview_screen_property
         mapview_screen.update_status_message("Waiting for GPS location...", 10)
@@ -169,16 +184,15 @@ class Controller(RelativeLayout):
                 on_location=self.on_location, on_status=self.on_status)
             gps.start()
         except NotImplementedError:
-            message = "GPS not found."
-            mapview_screen.update_status_message(message)
-            popup = PopupMessage(
-                        title="Error",
-                        body=message)
-            popup.open()
+            self.gps_not_found_message()
 
     def stop_gps_localize(self):
         mapview = self.mapview_property
-        gps.stop()
+        try:
+            gps.stop()
+        except NotImplementedError:
+            self.gps_not_found_message()
+            return
         if self.gps_marker is not None:
             mapview.remove_marker(self.gps_marker)
             self.gps_marker = None
