@@ -1,0 +1,3 @@
+title=GuyPS
+author=Andre Miras
+orientation=portrait

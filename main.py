@@ -6,8 +6,9 @@ from kivy.garden.mapview import MapView, MapMarker, Coordinate, MapSource
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.relativelayout import RelativeLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen
-from kivy.properties import StringProperty, ObjectProperty
+from kivy.properties import StringProperty, ObjectProperty, NumericProperty
 from kivy.animation import Animation
 from plyer import gps
 from geopy.geocoders import Nominatim
@@ -127,23 +128,45 @@ class CustomMapView(MapView):
         self.map_source = MapSource()
 
 
+class Toolbar(BoxLayout):
+    alpha_color = NumericProperty()
+
+    def __init__(self, **kwargs):
+        super(Toolbar, self).__init__(**kwargs)
+        self.show()
+
+    def show(self):
+        self.alpha_color = 0.6
+
+    def hide(self):
+        self.alpha_color = 0
+
+
 class MapViewScreen(Screen):
 
+    status_bar_property = ObjectProperty()
     status_message = StringProperty()
     search_input_property = ObjectProperty()
 
+    def __init__(self, **kwargs):
+        super(MapViewScreen, self).__init__(**kwargs)
+        # starts by default without the status message bar
+        Clock.schedule_once(self._clean_status_message, 0)
+
     def update_status_message(self, text, lifetime=3):
+        self.status_bar_property.show()
         self.status_message = text
         # http://kivy.org/docs/api-kivy.clock.html
         # You cannot unschedule an anonymous function unless you keep
         # a reference to it.
         # It's better to add *args to your function definition
         # so that it can be called with an arbitrary number of parameters.
-        Clock.unschedule(self.clean_status_message)
-        Clock.schedule_once(self.clean_status_message, lifetime)
+        Clock.unschedule(self._clean_status_message)
+        Clock.schedule_once(self._clean_status_message, lifetime)
 
-    def clean_status_message(self, dt):
-        self.update_status_message("")
+    def _clean_status_message(self, dt=None):
+        self.status_message = ""
+        self.status_bar_property.hide()
 
 
 class Controller(RelativeLayout):
