@@ -136,10 +136,14 @@ class Toolbar(BoxLayout):
         self.show()
 
     def show(self):
-        self.alpha_color = 0.6
+        widget = self
+        anim = Animation(alpha_color=0.6, duration=1)
+        anim.start(widget)
 
     def hide(self):
-        self.alpha_color = 0
+        widget = self
+        anim = Animation(alpha_color=0, duration=1)
+        anim.start(widget)
 
 
 class MapViewScreen(Screen):
