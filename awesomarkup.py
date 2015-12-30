@@ -1,6 +1,10 @@
 import os
 import yaml
-from distutils.sysconfig import get_python_lib
+try:
+    # uses LibYAML bindings (faster parser) when available
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
 
 
 FONT_DIRECTORY = 'static/fontawesome/'
@@ -8,7 +12,7 @@ FONT_PATH = os.path.join(FONT_DIRECTORY, 'fontawesome-webfont.ttf')
 YAML_PATH = os.path.join(FONT_DIRECTORY, 'icons.yml')
 
 with open(YAML_PATH) as icons_file:
-    icons_obj = yaml.load(icons_file)
+    icons_obj = yaml.load(icons_file, Loader=Loader)
 
 # creates a dictionary of {class: unicode} like so:
 # {
