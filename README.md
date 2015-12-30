@@ -10,7 +10,7 @@ The application gives access to offline maps. It runs on different operating sys
 ### Install Cython
 pip doesn't seem to pickup Cython from requirements.txt before installing kivy, so it must be installed first.
 
-    pip install $(grep Cython requirements.txt)
+    pip install $(grep ^Cython requirements.txt)
 
 ### Install requirements
 Then requirements from requirements.txt can be installed.
