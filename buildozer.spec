@@ -4,7 +4,7 @@
 title = GuyPS
 
 # (str) Package name
-package.name = myapp
+package.name = guyps
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.test
