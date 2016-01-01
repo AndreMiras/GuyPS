@@ -66,9 +66,8 @@ class CustomMapView(MapView):
     # default values
     DEFAULT_LATLON = (43.61, 3.88)
     DEFAULT_ZOOM = 8
-    # properties used for lat/lon and zoom animations
+    # properties used for lat/lon animations
     animated_latlon_property = ObjectProperty()
-    animated_zoom_property = NumericProperty()
 
     def __init__(self, **kwargs):
         """
@@ -80,19 +79,44 @@ class CustomMapView(MapView):
         self.zoom = CustomMapView.DEFAULT_ZOOM
         # updates animated properties with default values
         self.animated_latlon_property = Coordinate(self.lat, self.lon)
-        self.animated_zoom_property = self.zoom
+
+    def animated_diff_scale(self, d):
+        """
+        Makes a smooth differential in or out scaling.
+        Overloads MapView.animated_diff_scale_at() with default x, y values.
+        x, y are choosen to be the middle of the screen.
+        """
+        size_x, size_y = self.size
+        x = size_x / 2
+        y = size_y / 2
+        super(CustomMapView, self).animated_diff_scale_at(d, x, y)
+
+    def animated_zoom(self, zoom):
+        """
+        Makes a smooth in or out zoom.
+        """
+        diff = (zoom - self.zoom) + 1
+        self.animated_diff_scale(diff)
 
     def animated_center_on(self, latitude, longitude):
         """
         Animated move from current location to the new specified lat/lon.
+            1) zooms out
+            2) moves to location
+            3) zooms back to initial
         """
         widget = self
         initial_zoom = self.zoom
-        anim = Animation(animated_zoom_property=5, duration=1)
-        anim &= Animation(
+        # zooms out
+        Clock.schedule_once(
+            lambda dt: self.animated_zoom(5), 0)
+        # moves to location
+        anim = Animation(
             animated_latlon_property=Coordinate(latitude, longitude),
             duration=1)
-        anim += Animation(animated_zoom_property=initial_zoom, duration=1)
+        # zooms back to initial
+        Clock.schedule_once(
+            lambda dt: self.animated_zoom(initial_zoom), 1.5)
         anim.start(widget)
 
     def on_animated_latlon_property(self, instance, coordinate):
@@ -101,9 +125,6 @@ class CustomMapView(MapView):
         latitude = coordinate.lat
         longitude = coordinate.lon
         self.center_on(latitude, longitude)
-
-    def on_animated_zoom_property(self, instance, zoom):
-        self.zoom = int(zoom)
 
     def on_touch_down(self, touch):
         if touch.is_double_tap:
@@ -146,7 +167,8 @@ class CustomMapView(MapView):
         # centers on requested loaded mbtiles
         metadata = mbreader.metadata()
         if "center" in metadata:
-            longitude, latitude, zoom = map(float, metadata["center"].split(","))
+            center = metadata["center"]
+            longitude, latitude, zoom = map(float, center.split(","))
         self.animated_center_on(latitude, longitude)
         # defaults to the minimum available zoom
         min_zoom = int(metadata.get("minzoom", OFFLINE_MIN_ZOOM))
@@ -241,7 +263,6 @@ class Controller(RelativeLayout):
                     title="Error",
                     body=message)
         popup.open()
-
 
     def start_gps_localize(self):
         mapview_screen = self.mapview_screen_property
