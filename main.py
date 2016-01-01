@@ -63,16 +63,36 @@ class OfflineMapsScreen(Screen):
 
 class CustomMapView(MapView):
 
+    # default values
+    DEFAULT_LATLON = (43.61, 3.88)
+    DEFAULT_ZOOM = 8
+    # properties used for lat/lon and zoom animations
     animated_latlon_property = ObjectProperty()
+    animated_zoom_property = NumericProperty()
 
     def __init__(self, **kwargs):
+        """
+        Loads default lat/long and zoom values
+        """
         super(CustomMapView, self).__init__(**kwargs)
+        # loads default values
+        self.lat, self.lon = CustomMapView.DEFAULT_LATLON
+        self.zoom = CustomMapView.DEFAULT_ZOOM
+        # updates animated properties with default values
         self.animated_latlon_property = Coordinate(self.lat, self.lon)
+        self.animated_zoom_property = self.zoom
 
     def animated_center_on(self, latitude, longitude):
+        """
+        Animated move from current location to the new specified lat/lon.
+        """
         widget = self
-        anim = Animation(
-            animated_latlon_property=Coordinate(latitude, longitude))
+        initial_zoom = self.zoom
+        anim = Animation(animated_zoom_property=5, duration=1)
+        anim &= Animation(
+            animated_latlon_property=Coordinate(latitude, longitude),
+            duration=1)
+        anim += Animation(animated_zoom_property=initial_zoom, duration=1)
         anim.start(widget)
 
     def on_animated_latlon_property(self, instance, coordinate):
@@ -81,6 +101,9 @@ class CustomMapView(MapView):
         latitude = coordinate.lat
         longitude = coordinate.lon
         self.center_on(latitude, longitude)
+
+    def on_animated_zoom_property(self, instance, zoom):
+        self.zoom = int(zoom)
 
     def on_touch_down(self, touch):
         if touch.is_double_tap:
@@ -137,6 +160,7 @@ class CustomMapView(MapView):
 
 
 class Toolbar(BoxLayout):
+
     MAX_ALPHA = 0.6
     alpha_color = NumericProperty()
 
