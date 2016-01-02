@@ -217,10 +217,10 @@ class CustomMapView(MapView):
         metadata = mbreader.metadata()
         if "center" in metadata:
             center = metadata["center"]
-            longitude, latitude, zoom = map(float, center.split(","))
+            longitude, latitude, default_zoom = map(float, center.split(","))
         # defaults to the minimum available zoom
-        min_zoom = int(metadata.get("minzoom", OFFLINE_CITY_MIN_ZOOM))
-        self.animated_center_on(latitude, longitude, min_zoom)
+        zoom = int(default_zoom)
+        self.animated_center_on(latitude, longitude, zoom)
 
     def load_default_map_source(self):
         """
