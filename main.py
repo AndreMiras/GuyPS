@@ -153,7 +153,7 @@ class CustomMapView(MapView):
             3) zooms back to initial
         """
         widget = self
-        initial_zoom = zoom is not None and zoom or self.zoom
+        initial_zoom = zoom if zoom is not None else self.zoom
         zoom_out = 5
         duration = 2
         transition = 'in_out_expo'
