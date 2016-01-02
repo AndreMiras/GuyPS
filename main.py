@@ -119,7 +119,9 @@ class CustomMapView(MapView):
         Clock.unschedule(self._animated_zoom_to_target)
         Clock.schedule_interval(self._animated_zoom_to_target, 0.25)
 
-    def zoom_out_in(self, zoom_out, zoom_in=None, duration=2, transition='in_out_expo'):
+    def zoom_out_in(
+            self, zoom_out,
+            zoom_in=None, duration=2, transition='in_out_expo'):
         """
         Zooms out then back in using animations.
         if zoom_in value is None, zooms back to initial zoom.
@@ -154,7 +156,9 @@ class CustomMapView(MapView):
         duration = 2
         transition = 'in_out_expo'
         # zooms out and back in
-        self.zoom_out_in(zoom_out, zoom_in=initial_zoom, duration=duration, transition=transition)
+        self.zoom_out_in(
+            zoom_out, zoom_in=initial_zoom,
+            duration=duration, transition=transition)
         # moves to location
         anim = Animation(
             animated_latlon_property=Coordinate(latitude, longitude),
@@ -295,7 +299,8 @@ class Controller(RelativeLayout):
         # mapview = self.mapview_property
         # mapview_screen = self.mapview_screen_property
         # mapview.bind(
-        #     zoom=lambda obj, zoom: mapview_screen.update_status_message("Zoom level %s" % (zoom)))
+        #     zoom=lambda obj, zoom: mapview_screen.update_status_message(
+        #         "Zoom level %s" % (zoom)))
 
     def gps_not_found_message(self):
         """
