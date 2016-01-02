@@ -68,6 +68,7 @@ class CustomMapView(MapView):
     DEFAULT_ZOOM = 8
     # properties used for lat/lon animations
     animated_latlon_property = ObjectProperty()
+    animated_zoom_property = NumericProperty()
 
     def __init__(self, **kwargs):
         """
@@ -79,6 +80,7 @@ class CustomMapView(MapView):
         self.zoom = CustomMapView.DEFAULT_ZOOM
         # updates animated properties with default values
         self.animated_latlon_property = Coordinate(self.lat, self.lon)
+        self.animated_zoom_property = self.zoom
 
     def animated_diff_scale(self, d):
         """
@@ -91,12 +93,53 @@ class CustomMapView(MapView):
         y = size_y / 2
         super(CustomMapView, self).animated_diff_scale_at(d, x, y)
 
+    def _animated_zoom_to_target(self, dt):
+        """
+        Animated zoom until zoom target is reached.
+        """
+        diff = (self._zoom_target - self.zoom)
+        if diff == 0:
+            # zoom target is reached
+            return False
+        diff = diff < 0 and -1 or 1
+        self.animated_diff_scale(diff)
+
     def animated_zoom(self, zoom):
         """
         Makes a smooth in or out zoom.
         """
         diff = (zoom - self.zoom) + 1
         self.animated_diff_scale(diff)
+
+    def animated_zoom2(self, zoom):
+        """
+        Makes a smooth in or out zoom.
+        """
+        self._zoom_target = zoom
+        Clock.unschedule(self._animated_zoom_to_target)
+        Clock.schedule_interval(self._animated_zoom_to_target, 0.25)
+
+    def zoom_out_in(self, zoom_out, zoom_in=None, duration=2, transition='in_out_expo'):
+        """
+        Zooms out then back in using animations.
+        if zoom_in value is None, zooms back to initial zoom.
+        """
+        widget = self
+        if zoom_in is None:
+            # defaults to initial zoom
+            zoom_in = self.zoom
+        anim = Animation(
+            animated_zoom_property=zoom_out,
+            duration=duration/2.0,
+            t=transition)
+        anim += Animation(
+            animated_zoom_property=zoom_in,
+            duration=duration/2.0,
+            t=transition)
+        anim.start(widget)
+
+    def on_animated_zoom_property(self, instance, zoom):
+        self.zoom = int(zoom)
 
     def animated_center_on(self, latitude, longitude):
         """
@@ -107,16 +150,16 @@ class CustomMapView(MapView):
         """
         widget = self
         initial_zoom = self.zoom
-        # zooms out
-        Clock.schedule_once(
-            lambda dt: self.animated_zoom(5), 0)
+        zoom_out = 5
+        duration = 2
+        transition = 'in_out_expo'
+        # zooms out and back in
+        self.zoom_out_in(zoom_out, zoom_in=initial_zoom, duration=duration, transition=transition)
         # moves to location
         anim = Animation(
             animated_latlon_property=Coordinate(latitude, longitude),
-            duration=1)
-        # zooms back to initial
-        Clock.schedule_once(
-            lambda dt: self.animated_zoom(initial_zoom), 1.5)
+            duration=duration,
+            t=transition)
         anim.start(widget)
 
     def on_animated_latlon_property(self, instance, coordinate):
@@ -249,6 +292,10 @@ class Controller(RelativeLayout):
         search_input = self.mapview_screen_property.search_input_property
         search_input.bind(
             on_text_validate=lambda obj: self.on_search(search_input.text))
+        # mapview = self.mapview_property
+        # mapview_screen = self.mapview_screen_property
+        # mapview.bind(
+        #     zoom=lambda obj, zoom: mapview_screen.update_status_message("Zoom level %s" % (zoom)))
 
     def gps_not_found_message(self):
         """
