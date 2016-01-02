@@ -143,7 +143,7 @@ class CustomMapView(MapView):
     def on_animated_zoom_property(self, instance, zoom):
         self.zoom = int(zoom)
 
-    def animated_center_on(self, latitude, longitude):
+    def animated_center_on(self, latitude, longitude, zoom=None):
         """
         Animated move from current location to the new specified lat/lon.
             1) zooms out
@@ -151,7 +151,7 @@ class CustomMapView(MapView):
             3) zooms back to initial
         """
         widget = self
-        initial_zoom = self.zoom
+        initial_zoom = zoom is not None and zoom or self.zoom
         zoom_out = 5
         duration = 2
         transition = 'in_out_expo'
@@ -216,10 +216,9 @@ class CustomMapView(MapView):
         if "center" in metadata:
             center = metadata["center"]
             longitude, latitude, zoom = map(float, center.split(","))
-        self.animated_center_on(latitude, longitude)
         # defaults to the minimum available zoom
         min_zoom = int(metadata.get("minzoom", OFFLINE_MIN_ZOOM))
-        self.zoom = min_zoom
+        self.animated_center_on(latitude, longitude, min_zoom)
 
     def load_default_map_source(self):
         """
