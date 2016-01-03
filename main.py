@@ -392,7 +392,8 @@ class Controller(RelativeLayout):
                         body="Can't find location.")
             popup.open()
             return
-        if location.raw['type'] != 'city':
+        location_type = location.raw['type']
+        if location_type not in ['city', 'administrative']:
             popup = PopupMessage(
                         title="Error",
                         body="Only cities are allowed.")
