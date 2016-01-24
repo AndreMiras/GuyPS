@@ -48,8 +48,29 @@ class MbtMerge(object):
         Creates the largest bounding box that contains both
         source and destination.
         """
-        # TODO
-        pass
+        conn = sqlite3.connect(destination)
+        cursor = conn.cursor()
+        cursor.execute("ATTACH '%s' as db2" % (source))
+        metadata = dict(cursor.execute("SELECT * FROM metadata"))
+        metadata2 = dict(cursor.execute("SELECT * FROM db2.metadata"))
+        bounds = map(float, metadata["bounds"].split(","))
+        bounds2 = map(float, metadata2["bounds"].split(","))
+        both_bounds = [bounds, bounds2]
+        # creates the largest bounding box that contains both
+        left = min(
+            [tmp_bounds[0] for tmp_bounds in both_bounds])
+        bottom = min(
+            [tmp_bounds[1] for tmp_bounds in both_bounds])
+        right = max(
+            [tmp_bounds[2] for tmp_bounds in both_bounds])
+        top = max(
+            [tmp_bounds[3] for tmp_bounds in both_bounds])
+        # new_bounds = (left, bottom, right, top)
+        new_bounds_str = "%s,%s,%s,%s" % (left, bottom, right, top)
+        cursor.execute('UPDATE metadata SET value=:value WHERE name="bounds"', { "value": new_bounds_str })
+        cursor.execute("DETACH db2")
+        conn.commit()
+        conn.close()
 
     def _merge_metadata_table(self, source, destination):
         """
