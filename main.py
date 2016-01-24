@@ -77,13 +77,19 @@ class MbtMergeManager(object):
 
     def add_to_merged(self, mbtiles_path):
         """
-        Adds the mbtiles to the merged list, also removes it from the
-        not merged list.
+        Adds the mbtiles to the merged list.
         """
         merged = self.merged()
         merged.append(mbtiles_path)
         self.store.put('merged_mbtiles', list=merged)
 
+    def remove_from_merged(self, mbtiles_path):
+        """
+        Removes the mbtiles from the merged list.
+        """
+        merged = self.merged()
+        merged.remove(mbtiles_path)
+        self.store.put('merged_mbtiles', list=merged)
 
 class GpsMarker(MapMarker):
 
@@ -508,6 +514,8 @@ class Controller(RelativeLayout):
         """
         if delete:
             os.remove(filepath)
+            mbt_merge_manager = MbtMergeManager()
+            mbt_merge_manager.remove_from_merged(filepath)
         mb = MBTilesBuilder(filepath=filepath, cache=True)
         mb.add_coverage(bbox=bbox,
                         zoomlevels=zoomlevels)
