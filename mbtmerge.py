@@ -25,7 +25,6 @@ class MbtMerge(object):
         """
         Merges source and destination metadata minzoom and maxzoom values.
         """
-        print "_merge_metadata_zooms"
         conn = sqlite3.connect(destination)
         cursor = conn.cursor()
         cursor.execute("ATTACH '%s' as db2" % (source))
