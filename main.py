@@ -2,9 +2,10 @@ import os
 import glob
 import logging
 from threading import Thread
-from kivy.garden.mapview import MapView, MapMarker, Coordinate, MapSource
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.storage.jsonstore import JsonStore
+from kivy.garden.mapview import MapView, MapMarker, Coordinate, MapSource
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import Screen
@@ -18,6 +19,7 @@ from landez.sources import MBTilesReader
 from popupmessage import PopupMessage
 from confirmpopup import ConfirmPopup
 from mbtcsource import MBTilesCompositeMapSource
+from mbtmerge import MbtMerge
 
 
 __version__ = '0.1'
@@ -28,6 +30,59 @@ OFFLINE_CITY_MIN_ZOOM = 12
 OFFLINE_CITY_MAX_ZOOM = 15
 OFFLINE_WORLD_MIN_ZOOM = 0
 OFFLINE_WORLD_MAX_ZOOM = 5
+MBTILES_DIRECTORY_PATH = "mbtiles"
+MAIN_MBTILES_PATH = "main.mbtiles"
+JSON_STORE_PATH = "config.json"
+
+
+class MbtMergeManager(object):
+    """
+    Keeps track mbtiles merging state (merged vs not merged)
+    and handles merging.
+    """
+    def __init__(self):
+        json_store_path = App.get_running_app().json_store_path
+        self.store = JsonStore(json_store_path)
+
+    def merge_not_merged(self):
+        """
+        Merges not merged files.
+        """
+        mbtmerge = MbtMerge()
+        sources = self.not_merged()
+        destination = App.get_running_app().main_mbtiles_path
+        mbtmerge.merge(sources, destination)
+        for source in sources:
+            self.add_to_merged(source)
+
+    def not_merged(self):
+        """
+        Returns the list of not merged files.
+        """
+        merged_list = self.merged()
+        not_merged_list = App.get_running_app().mbtiles_paths
+        for merged in merged_list:
+          not_merged_list.remove(merged)
+        return not_merged_list
+
+    def merged(self):
+        """
+        Returns the list of merged files.
+        """
+        try:
+            merged = self.store.get('merged_mbtiles')['list']
+        except KeyError:
+            merged = []
+        return merged
+
+    def add_to_merged(self, mbtiles_path):
+        """
+        Adds the mbtiles to the merged list, also removes it from the
+        not merged list.
+        """
+        merged = self.merged()
+        merged.append(mbtiles_path)
+        self.store.put('merged_mbtiles', list=merged)
 
 
 class GpsMarker(MapMarker):
@@ -53,6 +108,17 @@ class GpsMarker(MapMarker):
 class OfflineMapsScreen(Screen):
 
     offline_maps_spinner = ObjectProperty()
+
+    def on_parent(self, instance, value):
+        """
+        Gets called when the widget gets loaded or unloaded.
+        Merges unmerged mbtiles files.
+        """
+        # self.parent is not None when the widget gets loaded
+        is_loaded = self.parent is not None
+        if is_loaded:
+            mbt_merge_manager = MbtMergeManager()
+            mbt_merge_manager.merge_not_merged()
 
     def available_offline_maps(self):
         """
@@ -205,8 +271,11 @@ class CustomMapView(MapView):
         """
         Loads all the downloaded *.mbtiles, but centers on the requested one.
         """
-        # downloaded *.mbtiles paths
-        mbtiles_paths = App.get_running_app().mbtiles_paths
+        mbt_merge_manager = MbtMergeManager()
+        not_merged_mbtiles = mbt_merge_manager.not_merged()
+        main_mbtiles_path = App.get_running_app().main_mbtiles_path
+        # not yet merged *.mbtiles plus main one
+        mbtiles_paths = not_merged_mbtiles + [main_mbtiles_path]
         # requested mbtiles path
         mbtiles_path = os.path.join(
             App.get_running_app().mbtiles_directory, mbtiles)
@@ -458,6 +527,9 @@ class Controller(RelativeLayout):
         self.prepare_download_for_offline2(filename, bbox, zoomlevels)
 
     def probe_mb_tiles_builder_thread(self, mb, mb_run_thread):
+        """
+        Probes tiles downloading.
+        """
         mapview_screen = self.mapview_screen_property
         mapview_screen.update_status_message(
             "Downloading tiles %s/%s" % (mb.rendered, mb.nbtiles), 10)
@@ -493,11 +565,25 @@ class MapViewApp(App):
         return True
 
     @property
+    def json_store_path(self):
+        """
+        Returns the JSON store file path.
+        """
+        return os.path.join(self.user_data_dir, JSON_STORE_PATH)
+
+    @property
+    def main_mbtiles_path(self):
+        """
+        Returns the merged mbtiles file path.
+        """
+        return os.path.join(self.user_data_dir, MAIN_MBTILES_PATH)
+
+    @property
     def mbtiles_directory(self):
         """
         Returns the mbtiles directory.
         """
-        return os.path.join(self.user_data_dir, 'mbtiles')
+        return os.path.join(self.user_data_dir, MBTILES_DIRECTORY_PATH)
 
     @property
     def mbtiles_paths(self):
