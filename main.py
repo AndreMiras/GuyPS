@@ -599,7 +599,7 @@ class MapViewApp(App):
         Returns the list of mbtiles files paths.
         """
         filepath = os.path.join(
-            self.mbtiles_directory, '*.mbtiles')
+            self.mbtiles_directory, u'*.mbtiles')
         filepaths = glob.glob(filepath)
         return filepaths
 
