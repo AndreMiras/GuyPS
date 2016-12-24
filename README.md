@@ -17,6 +17,10 @@ Then requirements from requirements.txt can be installed.
 
     pip install -r requirements.txt
 
+### Install garden requirements
+
+    garden install mapview
+
 ### Run on desktop
 
     python main.py
