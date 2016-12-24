@@ -4,9 +4,10 @@ requests==2.7.0
 # http://stackoverflow.com/a/26149110/185510
 Cython==0.21.2
 Kivy==1.9.0
-pygame==1.9.1release
+pygame==1.9.2
 Pillow==2.9.0
 geopy==1.10.0
 plyer==1.2.4
 landez==2.3.0
 buildozer==0.30
+PyYAML==3.12
