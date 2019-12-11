@@ -1,26 +1,27 @@
-import os
 import glob
 import logging
+import os
 from threading import Thread
+
+from geopy.exc import GeocoderServiceError
+from geopy.geocoders import Nominatim
+from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.storage.jsonstore import JsonStore
 from kivy.garden.mapview import MapView, MapMarker, Coordinate, MapSource
-from kivy.uix.relativelayout import RelativeLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty, ObjectProperty, NumericProperty
-from kivy.animation import Animation
-from plyer import gps
-from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderServiceError
+from kivy.storage.jsonstore import JsonStore
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.relativelayout import RelativeLayout
+from kivy.uix.screenmanager import Screen
 from landez import MBTilesBuilder
 from landez.sources import MBTilesReader
-from popupmessage import PopupMessage
+from plyer import gps
+
 from confirmpopup import ConfirmPopup
 from mbtcsource import MBTilesCompositeMapSource
 from mbtmerge import MbtMerge
-
+from popupmessage import PopupMessage
 
 __version__ = '0.1'
 logging.basicConfig(level=logging.DEBUG)
@@ -40,6 +41,7 @@ class MbtMergeManager(object):
     Keeps track mbtiles merging state (merged vs not merged)
     and handles merging.
     """
+
     def __init__(self):
         json_store_path = App.get_running_app().json_store_path
         self.store = JsonStore(json_store_path)
@@ -62,7 +64,7 @@ class MbtMergeManager(object):
         merged_list = self.merged()
         not_merged_list = App.get_running_app().mbtiles_paths
         for merged in merged_list:
-          not_merged_list.remove(merged)
+            not_merged_list.remove(merged)
         return not_merged_list
 
     def merged(self):
@@ -91,6 +93,7 @@ class MbtMergeManager(object):
         merged.remove(mbtiles_path)
         self.store.put('merged_mbtiles', list=merged)
 
+
 class GpsMarker(MapMarker):
 
     def update_position(self):
@@ -112,7 +115,6 @@ class GpsMarker(MapMarker):
 
 
 class OfflineMapsScreen(Screen):
-
     offline_maps_spinner = ObjectProperty()
 
     def on_parent(self, instance, value):
@@ -136,7 +138,6 @@ class OfflineMapsScreen(Screen):
 
 
 class CustomMapView(MapView):
-
     # default values
     DEFAULT_LATLON = (43.61, 3.88)
     DEFAULT_ZOOM = 8
@@ -194,8 +195,8 @@ class CustomMapView(MapView):
         Clock.schedule_interval(self._animated_zoom_to_target, 0.25)
 
     def zoom_out_in(
-            self, zoom_out,
-            zoom_in=None, duration=2, transition='in_out_expo'):
+        self, zoom_out,
+        zoom_in=None, duration=2, transition='in_out_expo'):
         """
         Zooms out then back in using animations.
         if zoom_in value is None, zooms back to initial zoom.
@@ -206,11 +207,11 @@ class CustomMapView(MapView):
             zoom_in = self.zoom
         anim = Animation(
             animated_zoom_property=zoom_out,
-            duration=duration/2.0,
+            duration=duration / 2.0,
             t=transition)
         anim += Animation(
             animated_zoom_property=zoom_in,
-            duration=duration/2.0,
+            duration=duration / 2.0,
             t=transition)
         anim.start(widget)
 
@@ -258,14 +259,14 @@ class CustomMapView(MapView):
             location = geolocator.geocode(text)
         except GeocoderServiceError as e:
             popup = PopupMessage(
-                        title="Error",
-                        body=e.message)
+                title="Error",
+                body=e.message)
             popup.open()
             return
         if location is None:
             popup = PopupMessage(
-                        title="Error",
-                        body="Can't find location.")
+                title="Error",
+                body="Can't find location.")
             popup.open()
             return
         latitude = location.latitude
@@ -305,7 +306,6 @@ class CustomMapView(MapView):
 
 
 class Toolbar(BoxLayout):
-
     MAX_ALPHA = 0.6
     alpha_color = NumericProperty()
 
@@ -331,7 +331,6 @@ class Toolbar(BoxLayout):
 
 
 class MapViewScreen(Screen):
-
     status_bar_property = ObjectProperty()
     status_message = StringProperty()
     search_input_property = ObjectProperty()
@@ -388,8 +387,8 @@ class Controller(RelativeLayout):
         mapview_screen.update_status_message(message)
         # popup error message
         popup = PopupMessage(
-                    title="Error",
-                    body=message)
+            title="Error",
+            body=message)
         popup.open()
 
     def start_gps_localize(self):
@@ -463,15 +462,15 @@ class Controller(RelativeLayout):
         location = geolocator.geocode(text)
         if location is None:
             popup = PopupMessage(
-                        title="Error",
-                        body="Can't find location.")
+                title="Error",
+                body="Can't find location.")
             popup.open()
             return
         location_type = location.raw['type']
         if location_type not in ['city', 'administrative']:
             popup = PopupMessage(
-                        title="Error",
-                        body="Only cities are allowed.")
+                title="Error",
+                body="Only cities are allowed.")
             popup.open()
             return
         # move to the downloading location
@@ -483,7 +482,7 @@ class Controller(RelativeLayout):
         geopy_bbox = location.raw['boundingbox']
         filename = city + '.mbtiles'
         bbox = self.geopy_bbox_to_bbox(geopy_bbox)
-        zoomlevels = range(OFFLINE_CITY_MIN_ZOOM, OFFLINE_CITY_MAX_ZOOM+1)
+        zoomlevels = range(OFFLINE_CITY_MIN_ZOOM, OFFLINE_CITY_MAX_ZOOM + 1)
         self.prepare_download_for_offline2(filename, bbox, zoomlevels)
 
     def prepare_download_for_offline2(self, filename, bbox, zoomlevels):
@@ -531,7 +530,7 @@ class Controller(RelativeLayout):
         """
         filename = 'World.mbtiles'
         bbox = (-179.0, -89.0, 179.0, 89.0)
-        zoomlevels = range(OFFLINE_WORLD_MIN_ZOOM, OFFLINE_WORLD_MAX_ZOOM+1)
+        zoomlevels = range(OFFLINE_WORLD_MIN_ZOOM, OFFLINE_WORLD_MAX_ZOOM + 1)
         self.prepare_download_for_offline2(filename, bbox, zoomlevels)
 
     def probe_mb_tiles_builder_thread(self, mb, mb_run_thread):
@@ -602,5 +601,6 @@ class MapViewApp(App):
             self.mbtiles_directory, u'*.mbtiles')
         filepaths = glob.glob(filepath)
         return filepaths
+
 
 MapViewApp().run()

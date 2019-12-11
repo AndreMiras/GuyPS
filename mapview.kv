@@ -70,21 +70,21 @@
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         Button:
-            text: u'%s Download world map' % awesomarkup('fa-globe')
+            text: '%s Download world map' % awesomarkup('fa-globe')
             markup: True
             on_press:
                 app.controller.download_world_map()
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         Button:
-            text: u'%s Back online' % awesomarkup('fa-signal')
+            text: '%s Back online' % awesomarkup('fa-signal')
             markup: True
             on_press:
                 app.controller.load_default_map_source()
                 root.manager.current = 'map'
                 root.manager.transition.direction = 'left'
         Button:
-            text: u'%s Back to menu' % awesomarkup('fa-bars')
+            text: '%s Back to menu' % awesomarkup('fa-bars')
             markup: True
             on_press:
                 root.manager.current = 'menu'
@@ -104,7 +104,7 @@
                         root.manager.current = 'map'
                         root.manager.transition.direction = 'left'
         ToggleButton:
-            text: u'%s GPS' % awesomarkup('fa-map-marker')
+            text: '%s GPS' % awesomarkup('fa-map-marker')
             markup: True
             on_state:
                 root.manager.current = 'map'
@@ -112,7 +112,7 @@
                 start = self.state == 'down'
                 app.controller.toggle_gps_localize(start)
         Button:
-            text: u'%s Offline maps' % awesomarkup('fa-download')
+            text: '%s Offline maps' % awesomarkup('fa-download')
             markup: True
             on_press:
                 root.manager.current = 'offline_maps'
@@ -138,7 +138,7 @@
         Button:
             size_hint_x: None
             width: '48dp'
-            text: u'%s' % awesomarkup('fa-bars')
+            text: awesomarkup('fa-bars')
             markup: True
             on_press:
                 root.manager.current = 'menu'

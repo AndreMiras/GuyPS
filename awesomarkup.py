@@ -27,6 +27,6 @@ class_unicode = dict(
 
 def awesomarkup(klass):
     code = class_unicode[klass]
-    uni_code = unichr(int(code, 16))
+    uni_code = chr(int(code, 16))
     markup = u'[font=%s]%s[/font]' % (FONT_PATH, uni_code)
     return markup
