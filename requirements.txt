@@ -23,7 +23,7 @@ Pillow==6.2.1
 plyer==1.4.2
 ptyprocess==0.6.0
 pygame==1.9.6
-Pygments==2.5.2
+Pygments==2.7.4
 pytoml==0.1.21
 PyYAML==5.2
 requests==2.22.0
