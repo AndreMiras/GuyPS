@@ -19,7 +19,7 @@ mbutil==0.3.0
 more-itertools==8.0.2
 pep517==0.8.1
 pexpect==4.7.0
-Pillow==6.2.1
+Pillow==9.0.1
 plyer==1.4.2
 ptyprocess==0.6.0
 pygame==1.9.6
